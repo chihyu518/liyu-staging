@@ -26,6 +26,13 @@ const safeText=(element,text)=>{element.textContent=String(text??'');return elem
 const el=(tag,cl,text)=>{const e=document.createElement(tag);if(cl)e.className=cl;if(text!==undefined)e.textContent=String(text);return e;};
 function message(text,error=false){$('message').textContent=text;$('message').className=error?'error':'';}
 async function call(action,more={}){
+  if (!API_URL || !API_URL.startsWith(
+    'https://script.google.com/macros/s/'
+  )) {
+    throw new Error(
+      'LIYU TEST 安全阻擋：尚未設定測試專用 API'
+    );
+  }
   if(!token)throw Error('尚未登入，請先回到 FanFlow 登入。');
   const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,token,...more})});
   if(!response.ok)throw Error('API HTTP '+response.status);
