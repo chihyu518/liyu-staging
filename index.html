@@ -1,10 +1,22 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FanFlow 2.0｜代購管理測試介面</title>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LIYU 2.0｜Firebase 登入測試</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#283044;background:#f7f7fc}*{box-sizing:border-box}body{margin:0}header{background:white;border-bottom:1px solid #e5e5f0;padding:18px max(18px,calc((100% - 1100px)/2));display:flex;align-items:center;justify-content:space-between;gap:8px}h1{font-size:22px;margin:0;color:#5c55c7}header a{color:#635bc7;text-decoration:none}main{max-width:1100px;margin:20px auto;padding:0 16px 50px}.sub{color:#667085;font-size:13px}.controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.controls label{min-width:260px;flex:1}label{display:block;font-size:13px;color:#434a60;font-weight:650}select,input,textarea{width:100%;padding:11px;border:1px solid #dcddeb;border-radius:10px;background:white;color:#242b3d;font:inherit;margin-top:5px}textarea{min-height:75px;resize:vertical}.panel{background:white;border-radius:16px;padding:20px;border:1px solid #ececf4;margin-top:16px;box-shadow:0 4px 20px #20204808}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.tabs button{border:1px solid #dcddec;border-radius:25px;background:white;color:#504e6a;padding:10px 14px;cursor:pointer}.tabs button.active,.primary{background:#605ac5!important;color:white!important;border-color:#605ac5!important}button{cursor:pointer;font:inherit;border:1px solid #dcddec;background:white;border-radius:10px;padding:10px 14px;color:#343b50}button:disabled{opacity:.55;cursor:not-allowed}.danger{color:#ba344a}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.item{padding:14px 0;border-top:1px solid #eee}.item:first-child{border-top:0}.muted{color:#6b7387}.notice{padding:13px;border-radius:10px;background:#f0effe;color:#473f85;margin:12px 0}#message{margin-top:12px;white-space:pre-wrap}#message.error{color:#a72745}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px}small{color:#667085}.num{font-variant-numeric:tabular-nums;font-size:23px;font-weight:750}.hidden{display:none!important}.pill{display:inline-block;background:#f0f0fa;padding:4px 9px;border-radius:20px;font-size:12px}.list{max-height:460px;overflow:auto}.actionbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}@media(max-width:650px){.grid,.grid.two{grid-template-columns:1fr}header{padding:16px}h1{font-size:18px}.panel{padding:16px}}
 </style></head><body>
-<header><h1>FanFlow 💜 <small>2.0 測試介面</small></h1><a href="groupbuy.html">← 原本代購頁</a></header>
-<main><div class="notice">開發測試頁：需要搭配第 136 步 GAS 在獨立測試環境部署。舊版正式 GAS 不支援下方 ff2 功能。請勿用正式收款資料測試。</div>
+<header><h1>LIYU 💜 <small>2.0 測試介面</small></h1><span class="pill">LIYU TEST｜Firebase Authentication</span></header>
+<main><section id="authPortal" class="panel" style="max-width:520px;margin:22px auto;padding:24px" aria-labelledby="authTitle">
+  <h2 id="authTitle">💜 LIYU TEST 登入</h2>
+  <p class="sub">使用 Firebase 測試帳號的電子郵件與密碼登入。登入後僅驗證 Firebase 身分，不會連接正式 FanFlow API。</p>
+  <form id="firebaseLoginForm">
+    <label>電子郵件<input id="firebaseEmail" type="email" autocomplete="username" placeholder="test@example.com" required></label>
+    <label style="margin-top:12px">密碼<input id="firebasePassword" type="password" autocomplete="current-password" required></label>
+    <div class="actionbar"><button class="primary" id="firebaseLoginButton" type="submit">登入 Firebase 測試帳號</button><button type="button" id="firebaseResetButton">寄送密碼重設郵件</button></div>
+  </form>
+  <div id="firebaseUserPanel" class="hidden"><p id="firebaseUserLabel"></p><button id="firebaseLogoutButton" type="button">登出</button></div>
+  <p id="firebaseAuthMessage" role="status" aria-live="polite" class="sub">正在連接 Firebase…</p>
+  <div class="notice">🔒 安全測試模式：目前僅測試 Firebase 登入、登出、密碼重設。代購／收款／訂單 API 尚未啟用，所有後端資料操作維持關閉。</div>
+</section>
+<div id="legacyDashboard" class="hidden"><div class="notice">開發測試頁：需要搭配第 136 步 GAS 在獨立測試環境部署。舊版正式 GAS 不支援下方 ff2 功能。請勿用正式收款資料測試。</div>
 <div class="panel"><div class="controls"><label>選擇代購活動<select id="group"><option value="">載入中…</option></select></label><button id="reload">重新整理</button><span class="pill" id="ownerBadge">登入檢查中</span></div><div id="message" role="status" aria-live="polite"></div></div>
 <nav class="tabs" aria-label="功能分類"><button data-tab="live" class="active">✈️ 連線購物</button><button data-tab="payments">💳 收款</button><button data-tab="expenses">🧾 支出</button><button data-tab="profit">📈 利潤</button><button data-tab="prices">🏷️ 雙價格</button><button data-tab="settings">⚙️ 連線設定</button></nav>
 <section class="panel" id="live"><h2>✈️ 連線購物項目</h2><p class="sub">團員可登記自己的購物需求；只有開團者能替外部買家登記、確認採買和正式成單。</p><div class="grid"><label>商品名稱<input id="liveName" placeholder="例如：日本限定吊飾"></label><label>原幣單價<input id="liveUnit" type="number" min="0" step="0.01"></label><label>數量<input id="liveQty" type="number" min="1" step="1" value="1"></label><label>商品連結<input id="liveUrl" type="url" placeholder="https://..."></label><label>圖片網址<input id="liveImage" type="url" placeholder="https://..."></label><label id="buyerWrap" class="hidden">買家<select id="liveBuyer"></select></label></div><label>備註<textarea id="liveNote"></textarea></label><div class="actionbar"><button id="addLive" class="primary">新增購物項目</button><button id="refreshLive">重新載入項目</button></div><div id="liveList" class="list"></div></section>
@@ -13,11 +25,11 @@
 <section class="panel hidden" id="profit"><h2>📈 開團者私人利潤</h2><div class="grid"><div><small>整團銷售額</small><div class="num" id="sales">—</div></div><div><small>淨收款</small><div class="num" id="received">—</div></div><div><small>整團利潤</small><div class="num" id="net">—</div></div></div><p class="notice" id="profitNote">尚未載入</p><h3>依買家統計</h3><div id="profitBuyers"></div><h3>依商品統計</h3><div id="profitProducts"></div><button id="refreshProfit">重新計算利潤</button></section>
 <section class="panel hidden" id="prices"><h2>🏷️ 商品雙價格</h2><p class="sub">只有開團者可以同時查看兩種售價並修改；團員取得的 API 回應不包含一般買家價格。</p><div id="productList" class="list"></div><button id="refreshProducts">重新載入商品</button></section>
 <section class="panel hidden" id="settings"><h2>⚙️ 代購計價設定</h2><p class="sub">只有開團者可設定。請先於 Notion 確認該活動模式後，再在測試環境調整計價。</p><div class="grid"><label>代購模式<select id="mode"><option>一般代購</option><option>連線代購</option></select></label><label>原幣<select id="currency"><option>TWD</option><option>JPY</option><option>KRW</option></select></label><label>換算匯率<input id="rate" type="number" min="0" step="0.000001"></label><label>團員加價（台幣／件）<input id="memberFee" type="number" min="0" step="0.01"></label><label>一般買家加價（台幣／件）<input id="buyerFee" type="number" min="0" step="0.01"></label></div><div class="actionbar"><button class="primary" id="saveSettings">儲存本團設定</button></div></section>
-</main>
+</div></main>
 <script>
 'use strict';
 const API_URL = '';
-const token=sessionStorage.getItem('fanflowSessionToken')||localStorage.getItem('fanflowSessionToken');
+const token = null; // 舊 FanFlow Session 已停用；Firebase ID token 只在未來經驗證的測試 API 使用
 const $=id=>document.getElementById(id);
 const val=id=>$(id).value.trim();
 const money=n=>n===null||n===undefined?'待確認':'NT$'+Number(n).toLocaleString('zh-TW',{maximumFractionDigits:2});
@@ -26,9 +38,7 @@ const safeText=(element,text)=>{element.textContent=String(text??'');return elem
 const el=(tag,cl,text)=>{const e=document.createElement(tag);if(cl)e.className=cl;if(text!==undefined)e.textContent=String(text);return e;};
 function message(text,error=false){$('message').textContent=text;$('message').className=error?'error':'';}
 async function call(action,more={}){
-  if (!API_URL || !API_URL.startsWith(
-    'https://script.google.com/macros/s/'
-  )) {
+  if (true) { // 此版本禁止所有 GAS 呼叫，避免任何正式環境請求
     throw new Error(
       'LIYU TEST 安全阻擋：尚未設定測試專用 API'
     );
@@ -60,5 +70,72 @@ function bind(id,fn){$(id).addEventListener('click',()=>busy($(id),fn));}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(!b.classList.contains('hidden'))showTab(b.dataset.tab);}));
 $('group').onchange=()=>{ownerUI();if(owner)loadMembers().catch(e=>message(e.message,true));loadTab().catch(e=>message(e.message,true));};
 bind('reload',async()=>{await init();});bind('addLive',addLive);bind('refreshLive',()=>loadLive(groupId()));bind('addPayment',addPayment);bind('refreshPayment',()=>loadPayments(groupId()));bind('addExpense',addExpense);bind('refreshExpense',()=>loadExpenses(groupId()));bind('refreshProfit',()=>loadProfit(groupId()));bind('refreshProducts',()=>loadProducts(groupId()));bind('saveSettings',saveSettings);
-init().catch(e=>message(e.message,true));
-</script></body></html>
+// 不執行舊版 init：目前只測試 Firebase Authentication
+</script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+
+  // Firebase Web 設定為用於前端的公開識別資訊，不包含管理員憑證。
+  const firebaseConfig = {
+    apiKey: 'AIzaSyAx-Z69-MOjuXxGH0hBOeZzWQoogB4v0Ks',
+    authDomain: 'liyu-2-test.firebaseapp.com',
+    projectId: 'liyu-2-test',
+    storageBucket: 'liyu-2-test.firebasestorage.app',
+    messagingSenderId: '546266899276',
+    appId: '1:546266899276:web:5b7ef922fc9f67f2ed65e9'
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const loginForm = document.getElementById('firebaseLoginForm');
+  const userPanel = document.getElementById('firebaseUserPanel');
+  const status = document.getElementById('firebaseAuthMessage');
+  const loginButton = document.getElementById('firebaseLoginButton');
+  function showStatus(message, isError=false) {
+    status.textContent = message;
+    status.style.color = isError ? '#a72745' : '#44506a';
+  }
+  onAuthStateChanged(auth, user => {
+    loginForm.classList.toggle('hidden', Boolean(user));
+    userPanel.classList.toggle('hidden', !user);
+    if (user) {
+      document.getElementById('firebaseUserLabel').textContent = '✅ Firebase 登入成功：' + (user.email || '測試使用者');
+      showStatus('Firebase 身分已確認。GAS 與 Notion 尚未串接，資料操作維持關閉。');
+    } else {
+      showStatus('請使用 Firebase 測試帳號登入（尚未建立帳號時，請先等下一步）。');
+    }
+  }, () => showStatus('Firebase 初始化失敗，請確認設定及網路連線。', true));
+  loginForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    loginButton.disabled = true;
+    showStatus('驗證中…');
+    try {
+      await signInWithEmailAndPassword(auth,
+        document.getElementById('firebaseEmail').value.trim(),
+        document.getElementById('firebasePassword').value);
+      document.getElementById('firebasePassword').value = '';
+    } catch (err) {
+      const messages = {
+        'auth/invalid-credential':'電子郵件或密碼不正確，或測試帳號尚未建立。',
+        'auth/invalid-email':'電子郵件格式不正確。',
+        'auth/too-many-requests':'嘗試次數過多，請稍後再試。',
+        'auth/network-request-failed':'網路連線失敗，請稍後再試。'
+      };
+      showStatus(messages[err.code] || '登入失敗：' + (err.code || '未知錯誤'), true);
+    } finally {
+      loginButton.disabled = false;
+    }
+  });
+  document.getElementById('firebaseLogoutButton').addEventListener('click', async () => {
+    try { await signOut(auth); } catch { showStatus('登出失敗，請重試。', true); }
+  });
+  document.getElementById('firebaseResetButton').addEventListener('click', async () => {
+    const email = document.getElementById('firebaseEmail').value.trim();
+    if (!email) { showStatus('請先輸入測試帳號的電子郵件。', true); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showStatus('若該電子郵件可以重設密碼，請查看收件匣。');
+    } catch (err) { showStatus('目前無法寄送重設郵件：' + (err.code || '未知錯誤'), true); }
+  });
+</script>
+</body></html>
