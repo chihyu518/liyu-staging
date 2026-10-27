@@ -210,7 +210,10 @@ const section = document.getElementById('liyu2MyGroupBuysSection');
 const list = document.getElementById('liyu2GroupBuysList');
 const message = document.getElementById('liyu2GroupBuysMessage');
 
-if (section) section.hidden = true;
+if (section) {
+  section.hidden = true;
+  section.style.display = 'none';
+}
 if (list) list.replaceChildren();
 if (message) message.textContent = '等待讀取 TEST 代購活動…';
     document.getElementById('firebaseUserLabel').textContent = '';
@@ -252,6 +255,7 @@ const groupBuysList =
   document.getElementById('liyu2GroupBuysList');
 
 groupBuysSection.hidden = false;
+groupBuysSection.style.display = 'block';
 groupBuysMessage.textContent = '正在讀取 TEST 代購活動…';
 groupBuysList.replaceChildren();
 
