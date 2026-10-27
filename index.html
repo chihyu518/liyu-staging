@@ -189,7 +189,55 @@ async function liyu2GetMyGroupBuysFromGas() {
 
   return result.data.activities;
 }
-  
+  // LIYU 2.0 TEST｜讀取指定代購活動詳細資料（唯讀）
+async function liyu2GetGroupBuyDetailFromGas(activityId) {
+
+  // 確認活動 ID 格式
+  if (
+    typeof activityId !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      .test(activityId)
+  ) {
+    throw new Error('活動 ID 格式不正確');
+  }
+
+  // 取得目前 Firebase 登入憑證
+  const idToken = await liyu2GetCurrentIdToken();
+
+  // 呼叫 TEST GAS API
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2GetGroupBuyDetail',
+      idToken: idToken,
+      activityId: activityId
+    }),
+    redirect: 'follow'
+  });
+
+  if (!response.ok) {
+    throw new Error('TEST 活動詳細資料 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  // 驗證 TEST API 回傳格式
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    !result.data.activity ||
+    result.data.activity.id?.toLowerCase() !== activityId.toLowerCase()
+  ) {
+    throw new Error('TEST 活動詳細資料讀取失敗');
+  }
+
+  return result.data.activity;
+}
   const loginForm = document.getElementById('firebaseLoginForm');
   const userPanel = document.getElementById('firebaseUserPanel');
   const status = document.getElementById('firebaseAuthMessage');
