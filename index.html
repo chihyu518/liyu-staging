@@ -205,6 +205,14 @@ onAuthStateChanged(auth, async user => {
   userPanel.classList.toggle('hidden', !user);
 
   if (!user) {
+    // LIYU 2.0 TEST｜登出時清除代購活動資料
+const section = document.getElementById('liyu2MyGroupBuysSection');
+const list = document.getElementById('liyu2GroupBuysList');
+const message = document.getElementById('liyu2GroupBuysMessage');
+
+if (section) section.hidden = true;
+if (list) list.replaceChildren();
+if (message) message.textContent = '等待讀取 TEST 代購活動…';
     document.getElementById('firebaseUserLabel').textContent = '';
     showStatus('請使用 Firebase 測試帳號登入。');
     return;
