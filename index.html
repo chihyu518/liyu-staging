@@ -211,6 +211,53 @@ async function liyu2GetMyGroupBuysFromGas() {
 
   return result.data.activities;
 }
+  // ========================================
+// LIYU 2.0 TEST｜讀取指定活動商品
+// 唯讀：不新增、不修改、不刪除
+// ========================================
+async function liyu2GetProductsFromGas(activityId) {
+
+  if (
+    typeof activityId !== 'string' ||
+    !/^[0-9a-f-]{36}$/i.test(activityId)
+  ) {
+    throw new Error('活動 ID 格式不正確');
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2GetProducts',
+      idToken: idToken,
+      activityId: activityId
+    }),
+    redirect: 'follow'
+  });
+
+  if (!response.ok) {
+    throw new Error('TEST 商品 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    result.data.activityId !== activityId ||
+    !Array.isArray(result.data.products)
+  ) {
+    throw new Error('TEST 商品資料驗證失敗');
+  }
+
+  return result.data.products;
+}
   // LIYU 2.0 TEST｜讀取指定代購活動詳細資料（唯讀）
 async function liyu2GetGroupBuyDetailFromGas(activityId) {
 
