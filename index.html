@@ -232,7 +232,63 @@ onAuthStateChanged(auth, async user => {
         (verified.displayName || 'Yu') +
         ' 🩵（資料操作尚未開放）'
       );
+// LIYU 2.0 TEST｜顯示管理員自己的代購活動
+const groupBuysSection =
+  document.getElementById('liyu2MyGroupBuysSection');
 
+const groupBuysMessage =
+  document.getElementById('liyu2GroupBuysMessage');
+
+const groupBuysList =
+  document.getElementById('liyu2GroupBuysList');
+
+groupBuysSection.hidden = false;
+groupBuysMessage.textContent = '正在讀取 TEST 代購活動…';
+groupBuysList.replaceChildren();
+
+try {
+  const activities = await liyu2GetMyGroupBuysFromGas();
+
+  // 避免登出或切換帳號後顯示上一位使用者的資料
+  if (auth.currentUser?.uid !== user.uid) return;
+
+  groupBuysMessage.textContent =
+    activities.length === 0
+      ? '目前沒有你建立的 TEST 代購活動。'
+      : `找到 ${activities.length} 筆 TEST 代購活動`;
+
+  activities.forEach(function(activity) {
+    const card = document.createElement('div');
+
+    card.style.cssText =
+      'padding:14px; margin-top:12px; border:1px solid #e5e7eb;' +
+      'border-radius:12px; background:#f8fafc;';
+
+    const title = document.createElement('strong');
+    title.textContent = activity.name || '未命名代購活動';
+
+    const details = document.createElement('p');
+    details.style.cssText =
+      'margin:8px 0 0; color:#64748b; white-space:pre-line;';
+
+    details.textContent = [
+      '團體／活動：' + (activity.event || '未設定'),
+      '截止日期：' + (activity.deadline || '未設定'),
+      '狀態：' + (activity.status || '未設定'),
+      '代購模式：' + (activity.mode || '未設定')
+    ].join('\n');
+
+    card.append(title, details);
+    groupBuysList.appendChild(card);
+  });
+
+} catch (error) {
+
+  if (auth.currentUser?.uid !== user.uid) return;
+
+  groupBuysMessage.textContent =
+    '❌ TEST 代購活動讀取失敗，請檢查 API。';
+}
     } else {
 
       showStatus(
