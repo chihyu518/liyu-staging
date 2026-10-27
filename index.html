@@ -13,6 +13,23 @@
     <div class="actionbar"><button class="primary" id="firebaseLoginButton" type="submit">登入 Firebase 測試帳號</button><button type="button" id="firebaseResetButton">寄送密碼重設郵件</button></div>
   </form>
   <div id="firebaseUserPanel" class="hidden"><p id="firebaseUserLabel"></p><button id="firebaseLogoutButton" type="button">登出</button></div>
+  <!-- LIYU 2.0 TEST｜我的代購活動 -->
+<section id="liyu2MyGroupBuysSection" hidden
+  style="margin-top:24px; padding:20px; background:#fff;
+         border-radius:16px; border:1px solid #e5e7eb;">
+
+  <h2 style="margin-top:0; font-size:20px;">
+    🛍️ 我的代購活動
+  </h2>
+
+  <p id="liyu2GroupBuysMessage"
+     style="color:#64748b;">
+    等待讀取 TEST 代購活動…
+  </p>
+
+  <div id="liyu2GroupBuysList"></div>
+
+</section>
   <p id="firebaseAuthMessage" role="status" aria-live="polite" class="sub">正在連接 Firebase…</p>
   <div class="notice">🔒 安全測試模式：目前僅測試 Firebase 登入、登出、密碼重設。代購／收款／訂單 API 尚未啟用，所有後端資料操作維持關閉。</div>
 </section>
