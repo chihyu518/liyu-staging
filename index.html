@@ -483,7 +483,84 @@ async function openActivityDetail() {
       row.textContent = field[0] + '：' + (field[1] || '—');
       detailContent.appendChild(row);
     });
+// 📦 LIYU TEST｜讀取目前活動的商品（唯讀）
+const productTitle = document.createElement('h3');
+productTitle.textContent = '📦 代購商品';
+detailContent.appendChild(productTitle);
 
+const productMessage = document.createElement('p');
+productMessage.textContent = '正在讀取商品…';
+detailContent.appendChild(productMessage);
+
+try {
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const productResponse = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2GetProducts',
+      idToken: idToken,
+      activityId: activity.id
+    }),
+    redirect: 'follow'
+  });
+
+  if (!productResponse.ok) {
+    throw new Error('商品 API 連線失敗');
+  }
+
+  const productResult = await productResponse.json();
+
+  if (
+    productResult.success !== true ||
+    productResult.environment !== 'TEST' ||
+    !productResult.data ||
+    productResult.data.activityId !== activity.id ||
+    !Array.isArray(productResult.data.products)
+  ) {
+    throw new Error('商品資料驗證失敗');
+  }
+
+  // 避免切換帳號後顯示上一位使用者的資料
+  if (
+    !auth.currentUser ||
+    auth.currentUser.uid !== currentUid
+  ) {
+    return;
+  }
+
+  const products = productResult.data.products;
+
+  productMessage.textContent =
+    '找到 ' + products.length + ' 筆商品';
+
+  products.forEach(function(product) {
+    const row = document.createElement('p');
+    row.textContent = '📦 ' + (product.name || '未命名商品');
+    detailContent.appendChild(row);
+  });
+
+  if (productResult.data.hasMore === true) {
+    const notice = document.createElement('p');
+    notice.textContent = '目前僅顯示部分商品';
+    detailContent.appendChild(notice);
+  }
+
+} catch (productError) {
+
+  if (
+    !auth.currentUser ||
+    auth.currentUser.uid !== currentUid
+  ) {
+    return;
+  }
+
+  productMessage.textContent =
+    '❌ 商品讀取失敗，請確認 TEST API。';
+}
   } catch (err) {
 
     if (auth.currentUser?.uid !== currentUid) {
