@@ -260,6 +260,44 @@ async function liyu2GetGroupBuyDetailFromGas(activityId) {
 
   return result.data.activity;
 }
+  // LIYU 2.0 TEST｜活動詳細資料返回與清除
+const liyu2DetailSection =
+  document.getElementById('liyu2GroupBuyDetailSection');
+
+const liyu2ListSection =
+  document.getElementById('liyu2MyGroupBuysSection');
+
+const liyu2DetailMessage =
+  document.getElementById('liyu2GroupBuyDetailMessage');
+
+const liyu2DetailContent =
+  document.getElementById('liyu2GroupBuyDetailContent');
+
+const liyu2BackButton =
+  document.getElementById('liyu2BackToGroupBuys');
+
+// 清除活動詳細資料
+function liyu2HideActivityDetail() {
+
+  liyu2DetailContent.replaceChildren();
+
+  liyu2DetailMessage.textContent =
+    '尚未選擇代購活動';
+
+  liyu2DetailSection.classList.add('hidden');
+  liyu2DetailSection.style.display = 'none';
+}
+
+// 返回自己的代購活動列表
+liyu2BackButton.addEventListener('click', function() {
+
+  liyu2HideActivityDetail();
+
+  if (auth.currentUser) {
+    liyu2ListSection.classList.remove('hidden');
+    liyu2ListSection.style.display = 'block';
+  }
+});
   const loginForm = document.getElementById('firebaseLoginForm');
   const userPanel = document.getElementById('firebaseUserPanel');
   const status = document.getElementById('firebaseAuthMessage');
@@ -286,6 +324,7 @@ if (section) {
 }
 if (list) list.replaceChildren();
 if (message) message.textContent = '等待讀取 TEST 代購活動…';
+  liyu2HideActivityDetail();
     document.getElementById('firebaseUserLabel').textContent = '';
     showStatus('請使用 Firebase 測試帳號登入。');
     return;
