@@ -97,6 +97,44 @@ async function liyu2GetCurrentIdToken() {
 
   return await user.getIdToken();
 }
+  // LIYU 2.0 TEST｜向 GAS 確認目前登入者身分
+async function liyu2VerifyCurrentUserWithGas() {
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2WhoAmI',
+      idToken: idToken
+    }),
+    redirect: 'follow'
+  });
+
+  if (!response.ok) {
+    throw new Error('TEST API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data
+  ) {
+    throw new Error('TEST 管理員身分驗證未通過');
+  }
+
+  return {
+    displayName: result.data.displayName || '',
+    role: result.data.role,
+    isAdmin: result.data.isAdmin === true
+  };
+}
   const loginForm = document.getElementById('firebaseLoginForm');
   const userPanel = document.getElementById('firebaseUserPanel');
   const status = document.getElementById('firebaseAuthMessage');
