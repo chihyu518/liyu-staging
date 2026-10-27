@@ -143,16 +143,72 @@ async function liyu2VerifyCurrentUserWithGas() {
     status.textContent = message;
     status.style.color = isError ? '#a72745' : '#44506a';
   }
-  onAuthStateChanged(auth, user => {
-    loginForm.classList.toggle('hidden', Boolean(user));
-    userPanel.classList.toggle('hidden', !user);
-    if (user) {
-      document.getElementById('firebaseUserLabel').textContent = '✅ Firebase 登入成功：' + (user.email || '測試使用者');
-      showStatus('Firebase 身分已確認。GAS 與 Notion 尚未串接，資料操作維持關閉。');
-    } else {
-      showStatus('請使用 Firebase 測試帳號登入（尚未建立帳號時，請先等下一步）。');
+  // LIYU 2.0 TEST｜Firebase 登入後確認 GAS 身分
+onAuthStateChanged(auth, async user => {
+
+  loginForm.classList.toggle('hidden', Boolean(user));
+  userPanel.classList.toggle('hidden', !user);
+
+  if (!user) {
+    document.getElementById('firebaseUserLabel').textContent = '';
+    showStatus('請使用 Firebase 測試帳號登入。');
+    return;
+  }
+
+  document.getElementById('firebaseUserLabel').textContent =
+    '✅ Firebase 登入成功：' +
+    (user.email || '測試使用者');
+
+  showStatus('正在向 LIYU TEST API 確認身分…');
+
+  try {
+
+    const verified =
+      await liyu2VerifyCurrentUserWithGas();
+
+    // 避免驗證期間已登出或切換帳號
+    if (auth.currentUser?.uid !== user.uid) {
+      return;
     }
-  }, () => showStatus('Firebase 初始化失敗，請確認設定及網路連線。', true));
+
+    if (verified.isAdmin === true) {
+
+      showStatus(
+        '✅ LIYU TEST 管理員驗證成功！歡迎 ' +
+        (verified.displayName || 'Yu') +
+        ' 🩵（資料操作尚未開放）'
+      );
+
+    } else {
+
+      showStatus(
+        '✅ LIYU TEST 身分驗證成功！' +
+        '目前帳號不是管理員，資料操作尚未開放。'
+      );
+
+    }
+
+  } catch (err) {
+
+    if (auth.currentUser?.uid !== user.uid) {
+      return;
+    }
+
+    // 不顯示 Token 或 API 內部錯誤
+    showStatus(
+      '❌ LIYU TEST API 身分驗證未完成，' +
+      '請確認連線及測試帳號權限。',
+      true
+    );
+
+  }
+
+}, () => {
+  showStatus(
+    'Firebase 初始化失敗，請確認設定及網路連線。',
+    true
+  );
+});
   loginForm.addEventListener('submit', async event => {
     event.preventDefault();
     loginButton.disabled = true;
