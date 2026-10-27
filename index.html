@@ -87,6 +87,16 @@ bind('reload',async()=>{await init();});bind('addLive',addLive);bind('refreshLiv
   };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  // LIYU 2.0 TEST｜取得目前登入者的 Firebase ID Token
+async function liyu2GetCurrentIdToken() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error('請先登入 Firebase');
+  }
+
+  return await user.getIdToken();
+}
   const loginForm = document.getElementById('firebaseLoginForm');
   const userPanel = document.getElementById('firebaseUserPanel');
   const status = document.getElementById('firebaseAuthMessage');
