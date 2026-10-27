@@ -342,7 +342,81 @@ try {
 
   activities.forEach(function(activity) {
     const card = document.createElement('div');
+// LIYU 2.0 TEST｜點擊代購活動查看詳細資料
+card.style.cursor = 'pointer';
+card.setAttribute('role', 'button');
+card.setAttribute('tabindex', '0');
 
+async function openActivityDetail() {
+
+  const detailSection =
+    document.getElementById('liyu2GroupBuyDetailSection');
+
+  const detailMessage =
+    document.getElementById('liyu2GroupBuyDetailMessage');
+
+  const detailContent =
+    document.getElementById('liyu2GroupBuyDetailContent');
+
+  const listSection =
+    document.getElementById('liyu2MyGroupBuysSection');
+
+  // 先清空上一筆活動資料
+  detailContent.replaceChildren();
+  detailMessage.textContent = '正在讀取活動詳細資料…';
+
+  // 切換顯示區塊
+  listSection.style.display = 'none';
+  detailSection.classList.remove('hidden');
+  detailSection.style.display = 'block';
+
+  const currentUid = auth.currentUser?.uid;
+
+  try {
+
+    const detail =
+      await liyu2GetGroupBuyDetailFromGas(activity.id);
+
+    // 避免切換帳號後顯示上一位使用者的資料
+    if (!currentUid || auth.currentUser?.uid !== currentUid) {
+      return;
+    }
+
+    detailMessage.textContent = '✅ 活動詳細資料讀取成功';
+
+    const fields = [
+      ['代購名稱', detail.name],
+      ['團體／活動', detail.event],
+      ['截止日期', detail.deadline],
+      ['狀態', detail.status],
+      ['代購模式', detail.mode]
+    ];
+
+    fields.forEach(function(field) {
+      const row = document.createElement('p');
+      row.textContent = field[0] + '：' + (field[1] || '—');
+      detailContent.appendChild(row);
+    });
+
+  } catch (err) {
+
+    if (auth.currentUser?.uid !== currentUid) {
+      return;
+    }
+
+    detailMessage.textContent =
+      '❌ 活動詳細資料讀取失敗，請確認 TEST API。';
+  }
+}
+
+card.addEventListener('click', openActivityDetail);
+
+card.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    openActivityDetail();
+  }
+});
     card.style.cssText =
       'padding:14px; margin-top:12px; border:1px solid #e5e7eb;' +
       'border-radius:12px; background:#f8fafc;';
