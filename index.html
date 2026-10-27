@@ -102,7 +102,7 @@ async function liyu2VerifyCurrentUserWithGas() {
 
   const idToken = await liyu2GetCurrentIdToken();
 
-  const response = await fetch(API_URL, {
+  const response = await fetch(window.API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'text/plain;charset=utf-8'
