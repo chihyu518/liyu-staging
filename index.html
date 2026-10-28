@@ -744,32 +744,74 @@ statusActions.forEach(function(action) {
   // LIYU 2.0 TEST｜付款狀態下拉選單
 // 純前端測試，不呼叫 API
 
+// ========================================
+// LIYU 2.0 TEST｜訂單狀態共用下拉選單
+// 純前端測試，不呼叫 GAS、不修改 Notion
+// ========================================
+
 button.addEventListener('click', function() {
 
-  // 其他兩個按鈕暫時維持原本功能
-  if (action.type !== '付款') {
+  // 三種狀態的設定
+  const statusConfig = {
+    '付款': {
+      icon: '💳',
+      field: 'paymentStatus',
+      options: [
+        '未付款',
+        '已付款',
+        '已付款(需二補)',
+        '已付款(免二補)'
+      ]
+    },
 
-    alert(
-      '🧪 LIYU 2.0 TEST\n\n' +
-      '操作：修改' + action.type + '狀態\n\n' +
-      '目前為安全測試模式，尚未開放資料修改。'
-    );
+    '到貨': {
+      icon: '📦',
+      field: 'orderStatus',
+      options: [
+        '未到貨',
+        '已到貨',
+        '已交付'
+      ]
+    },
 
+    '購買': {
+      icon: '🛒',
+      field: 'purchaseStatus',
+      options: [
+        '尚未購買',
+        '已購買'
+      ]
+    }
+  };
+
+  const config = statusConfig[action.type];
+
+  if (!config) {
+    alert('不支援此狀態類型');
     return;
   }
 
-  // 避免重複開啟選單
+  // 同一張訂單只顯示一個編輯面板
   const existingPanel =
-    card.querySelector('.liyu2-payment-panel');
+    card.querySelector('.liyu2-status-panel');
 
   if (existingPanel) {
+
+    const sameType =
+      existingPanel.dataset.statusType === action.type;
+
     existingPanel.remove();
-    return;
+
+    // 點擊同一個按鈕時，收起選單
+    if (sameType) {
+      return;
+    }
   }
 
   const panel = document.createElement('div');
 
-  panel.className = 'liyu2-payment-panel';
+  panel.className = 'liyu2-status-panel';
+  panel.dataset.statusType = action.type;
 
   panel.style.cssText =
     'margin-top:12px;' +
@@ -778,9 +820,11 @@ button.addEventListener('click', function() {
     'border:1px solid #dce7ef;' +
     'border-radius:12px;';
 
+  // 標題
   const heading = document.createElement('div');
 
-  heading.textContent = '💳 修改付款狀態';
+  heading.textContent =
+    config.icon + ' 修改' + action.type + '狀態';
 
   heading.style.cssText =
     'font-weight:700;' +
@@ -789,10 +833,16 @@ button.addEventListener('click', function() {
 
   panel.appendChild(heading);
 
+  // 目前狀態
+  const currentStatus =
+    String(order[config.field] || '—')
+      .replace(/^[🔴🟢🟡🔵⚪]\s*/u, '')
+      .trim();
+
   const current = document.createElement('div');
 
   current.textContent =
-    '目前狀態：' + (order.paymentStatus || '—');
+    '目前狀態：' + (order[config.field] || '—');
 
   current.style.cssText =
     'font-size:13px;' +
@@ -801,6 +851,7 @@ button.addEventListener('click', function() {
 
   panel.appendChild(current);
 
+  // 下拉選單
   const select = document.createElement('select');
 
   select.style.cssText =
@@ -811,21 +862,18 @@ button.addEventListener('click', function() {
     'background:#f8fbff;' +
     'color:#405c73;';
 
-  const options = [
-    '未付款',
-    '已付款',
-    '已付款(需二補)',
-    '已付款(免二補)'
-  ];
-
   const placeholder = document.createElement('option');
+
   placeholder.value = '';
-  placeholder.textContent = '請選擇付款狀態';
+  placeholder.textContent =
+    '請選擇' + action.type + '狀態';
+
   placeholder.disabled = true;
   placeholder.selected = true;
+
   select.appendChild(placeholder);
 
-  options.forEach(function(status) {
+  config.options.forEach(function(status) {
 
     const option = document.createElement('option');
 
@@ -838,6 +886,7 @@ button.addEventListener('click', function() {
 
   panel.appendChild(select);
 
+  // 操作按鈕區
   const controls = document.createElement('div');
 
   controls.style.cssText =
@@ -845,6 +894,7 @@ button.addEventListener('click', function() {
     'gap:8px;' +
     'margin-top:12px;';
 
+  // 確認修改
   const confirmButton = document.createElement('button');
 
   confirmButton.type = 'button';
@@ -861,18 +911,20 @@ button.addEventListener('click', function() {
   confirmButton.addEventListener('click', function() {
 
     if (!select.value) {
-      alert('請先選擇付款狀態');
+      alert('請先選擇' + action.type + '狀態');
       return;
     }
 
-    if (select.value === order.paymentStatus) {
+    if (select.value === currentStatus) {
       alert('新狀態與目前狀態相同');
       return;
     }
 
+    // 安全測試：不呼叫任何 API
     alert(
       '🧪 LIYU 2.0 TEST\n\n' +
-      '目前狀態：' + order.paymentStatus + '\n' +
+      '操作：修改' + action.type + '狀態\n' +
+      '目前狀態：' + currentStatus + '\n' +
       '選擇狀態：' + select.value + '\n\n' +
       '安全測試成功！\n' +
       '尚未修改 Notion 資料。'
@@ -880,6 +932,7 @@ button.addEventListener('click', function() {
 
   });
 
+  // 取消
   const cancelButton = document.createElement('button');
 
   cancelButton.type = 'button';
