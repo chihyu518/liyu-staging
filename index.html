@@ -741,16 +741,170 @@ statusActions.forEach(function(action) {
     'font-size:13px;' +
     'cursor:pointer;';
 
-  button.addEventListener('click', function() {
+  // LIYU 2.0 TEST｜付款狀態下拉選單
+// 純前端測試，不呼叫 API
+
+button.addEventListener('click', function() {
+
+  // 其他兩個按鈕暫時維持原本功能
+  if (action.type !== '付款') {
 
     alert(
       '🧪 LIYU 2.0 TEST\n\n' +
-      '訂單：' + (order.productName || '未命名商品') + '\n' +
       '操作：修改' + action.type + '狀態\n\n' +
       '目前為安全測試模式，尚未開放資料修改。'
     );
 
+    return;
+  }
+
+  // 避免重複開啟選單
+  const existingPanel =
+    card.querySelector('.liyu2-payment-panel');
+
+  if (existingPanel) {
+    existingPanel.remove();
+    return;
+  }
+
+  const panel = document.createElement('div');
+
+  panel.className = 'liyu2-payment-panel';
+
+  panel.style.cssText =
+    'margin-top:12px;' +
+    'padding:14px;' +
+    'background:#ffffff;' +
+    'border:1px solid #dce7ef;' +
+    'border-radius:12px;';
+
+  const heading = document.createElement('div');
+
+  heading.textContent = '💳 修改付款狀態';
+
+  heading.style.cssText =
+    'font-weight:700;' +
+    'color:#405c73;' +
+    'margin-bottom:10px;';
+
+  panel.appendChild(heading);
+
+  const current = document.createElement('div');
+
+  current.textContent =
+    '目前狀態：' + (order.paymentStatus || '—');
+
+  current.style.cssText =
+    'font-size:13px;' +
+    'color:#64748b;' +
+    'margin-bottom:10px;';
+
+  panel.appendChild(current);
+
+  const select = document.createElement('select');
+
+  select.style.cssText =
+    'width:100%;' +
+    'padding:10px;' +
+    'border:1px solid #c9dce9;' +
+    'border-radius:10px;' +
+    'background:#f8fbff;' +
+    'color:#405c73;';
+
+  const options = [
+    '未付款',
+    '已付款',
+    '已付款(需二補)',
+    '已付款(免二補)'
+  ];
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '請選擇付款狀態';
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  select.appendChild(placeholder);
+
+  options.forEach(function(status) {
+
+    const option = document.createElement('option');
+
+    option.value = status;
+    option.textContent = status;
+
+    select.appendChild(option);
+
   });
+
+  panel.appendChild(select);
+
+  const controls = document.createElement('div');
+
+  controls.style.cssText =
+    'display:flex;' +
+    'gap:8px;' +
+    'margin-top:12px;';
+
+  const confirmButton = document.createElement('button');
+
+  confirmButton.type = 'button';
+  confirmButton.textContent = '確認修改';
+
+  confirmButton.style.cssText =
+    'padding:9px 14px;' +
+    'border:none;' +
+    'border-radius:10px;' +
+    'background:#a9c8dc;' +
+    'color:#ffffff;' +
+    'cursor:pointer;';
+
+  confirmButton.addEventListener('click', function() {
+
+    if (!select.value) {
+      alert('請先選擇付款狀態');
+      return;
+    }
+
+    if (select.value === order.paymentStatus) {
+      alert('新狀態與目前狀態相同');
+      return;
+    }
+
+    alert(
+      '🧪 LIYU 2.0 TEST\n\n' +
+      '目前狀態：' + order.paymentStatus + '\n' +
+      '選擇狀態：' + select.value + '\n\n' +
+      '安全測試成功！\n' +
+      '尚未修改 Notion 資料。'
+    );
+
+  });
+
+  const cancelButton = document.createElement('button');
+
+  cancelButton.type = 'button';
+  cancelButton.textContent = '取消';
+
+  cancelButton.style.cssText =
+    'padding:9px 14px;' +
+    'border:1px solid #dce7ef;' +
+    'border-radius:10px;' +
+    'background:#ffffff;' +
+    'color:#64748b;' +
+    'cursor:pointer;';
+
+  cancelButton.addEventListener('click', function() {
+    panel.remove();
+  });
+
+  controls.appendChild(confirmButton);
+  controls.appendChild(cancelButton);
+
+  panel.appendChild(controls);
+
+  card.appendChild(panel);
+
+});
 
   actionBox.appendChild(button);
 
