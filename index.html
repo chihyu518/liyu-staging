@@ -645,27 +645,71 @@ try {
     detailContent.appendChild(emptyMessage);
   }
 
-  orderData.orders.forEach(function(order) {
-    const row = document.createElement('div');
+  // ========================================
+// LIYU 2.0 TEST｜代購訂單卡片（唯讀）
+// ========================================
+orderData.orders.forEach(function(order) {
 
-    row.style.cssText =
-      'padding:12px; margin-top:10px;' +
-      'border:1px solid #e5e7eb;' +
-      'border-radius:12px; background:#f8fafc;';
+  const card = document.createElement('div');
 
-    row.textContent =
-      '📦 ' + (order.productName || '未命名商品') +
-      '｜姓名：' + (order.buyerName || '—') +
-      '｜數量：' + order.quantity +
-      '｜總額：NT$' + order.totalAmount +
-      '｜付款：' + (order.paymentStatus || '—') +
-      '｜到貨：' + (order.orderStatus || '—') +
-      '｜購買：' + (order.purchaseStatus || '—') +
-      '｜取消：' + (order.cancelled === true ? '🚫 已取消' : '未取消');
+  card.style.cssText =
+    'padding:16px; margin-top:12px;' +
+    'border:1px solid #dce7ef;' +
+    'border-radius:16px;' +
+    'background:#f8fbff;' +
+    'box-shadow:0 3px 10px rgba(80,110,140,0.05);';
 
-    detailContent.appendChild(row);
-  });
+  // 商品名稱
+  const title = document.createElement('div');
 
+  title.style.cssText =
+    'font-size:16px; font-weight:700;' +
+    'color:#405c73; margin-bottom:12px;';
+
+  title.textContent =
+    '📦 ' + (order.productName || '未命名商品');
+
+  card.appendChild(title);
+
+  // 訂單基本資料
+  const info = document.createElement('div');
+
+  info.style.cssText =
+    'font-size:14px; line-height:1.9;' +
+    'color:#475569;';
+
+  info.textContent =
+    '👤 買家：' + (order.buyerName || '—') + '\n' +
+    '🔢 數量：' + order.quantity + '\n' +
+    '💰 總金額：NT$' + order.totalAmount;
+
+  info.style.whiteSpace = 'pre-line';
+
+  card.appendChild(info);
+
+  // 狀態區塊
+  const statusBox = document.createElement('div');
+
+  statusBox.style.cssText =
+    'margin-top:12px; padding:12px;' +
+    'background:#ffffff;' +
+    'border-radius:12px;' +
+    'font-size:13px; line-height:2;' +
+    'color:#526477; white-space:pre-line;';
+
+  statusBox.textContent =
+    '💳 付款：' + (order.paymentStatus || '—') + '\n' +
+    '📦 到貨：' + (order.orderStatus || '—') + '\n' +
+    '🛒 購買：' + (order.purchaseStatus || '—') + '\n' +
+    '🚫 取消：' +
+    (order.cancelled === true ? '已取消' : '未取消');
+
+  card.appendChild(statusBox);
+
+  detailContent.appendChild(card);
+
+});
+  
 } catch (orderError) {
 
   if (
