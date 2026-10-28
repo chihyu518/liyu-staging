@@ -612,6 +612,70 @@ try {
   productMessage.textContent =
     '❌ 商品讀取失敗，請確認 TEST API。';
 }
+    // ========================================
+// LIYU 2.0 TEST｜顯示代購訂單（唯讀）
+// ========================================
+const orderTitle = document.createElement('h3');
+orderTitle.textContent = '🧾 代購訂單';
+detailContent.appendChild(orderTitle);
+
+const orderMessage = document.createElement('p');
+orderMessage.textContent = '正在讀取訂單…';
+detailContent.appendChild(orderMessage);
+
+try {
+  const orderData = await liyu2GetGroupBuyOrdersFromGas(
+    activity.id
+  );
+
+  // 避免切換帳號後顯示上一位使用者的訂單
+  if (
+    !auth.currentUser ||
+    auth.currentUser.uid !== currentUid
+  ) {
+    return;
+  }
+
+  orderMessage.textContent =
+    '✅ 找到 ' + orderData.orders.length + ' 筆訂單';
+
+  if (orderData.orders.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = '目前沒有訂單';
+    detailContent.appendChild(emptyMessage);
+  }
+
+  orderData.orders.forEach(function(order) {
+    const row = document.createElement('div');
+
+    row.style.cssText =
+      'padding:12px; margin-top:10px;' +
+      'border:1px solid #e5e7eb;' +
+      'border-radius:12px; background:#f8fafc;';
+
+    row.textContent =
+      '📦 ' + (order.productName || '未命名商品') +
+      '｜姓名：' + (order.buyerName || '—') +
+      '｜數量：' + order.quantity +
+      '｜總額：NT$' + order.totalAmount +
+      '｜付款：' + (order.paymentStatus || '—') +
+      '｜到貨：' + (order.orderStatus || '—');
+
+    detailContent.appendChild(row);
+  });
+
+} catch (orderError) {
+
+  if (
+    !auth.currentUser ||
+    auth.currentUser.uid !== currentUid
+  ) {
+    return;
+  }
+
+  orderMessage.textContent =
+    '❌ 訂單讀取失敗，請確認 TEST API。';
+}
   } catch (err) {
 
     if (auth.currentUser?.uid !== currentUid) {
