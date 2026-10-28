@@ -659,7 +659,8 @@ try {
       '｜數量：' + order.quantity +
       '｜總額：NT$' + order.totalAmount +
       '｜付款：' + (order.paymentStatus || '—') +
-      '｜到貨：' + (order.orderStatus || '—');
+      '｜到貨：' + (order.orderStatus || '—') +
+      '｜購買：' + (order.purchaseStatus || '—');
 
     detailContent.appendChild(row);
   });
