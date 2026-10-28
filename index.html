@@ -679,7 +679,10 @@ orderData.orders.forEach(function(order) {
     'color:#475569;';
 
   info.textContent =
-    '👤 買家：' + (order.buyerName || '—') + '\n' +
+    '👤 買家：' +
+    (order.buyerName
+      ? order.buyerName.split(' | ')[0].trim()
+      : '—') + '\n' +
     '🔢 數量：' + order.quantity + '\n' +
     '💰 總金額：NT$' + order.totalAmount;
 
