@@ -708,7 +708,55 @@ orderData.orders.forEach(function(order) {
     (order.cancelled === true ? '已取消' : '未取消');
 
   card.appendChild(statusBox);
+// ========================================
+// LIYU 2.0 TEST｜訂單狀態管理按鈕
+// 安全測試版：不呼叫 API、不寫入資料
+// ========================================
 
+const actionBox = document.createElement('div');
+
+actionBox.style.cssText =
+  'display:flex; flex-wrap:wrap; gap:8px;' +
+  'margin-top:12px;';
+
+const statusActions = [
+  { label: '💳 修改付款', type: '付款' },
+  { label: '📦 修改到貨', type: '到貨' },
+  { label: '🛒 修改購買', type: '購買' }
+];
+
+statusActions.forEach(function(action) {
+
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.textContent = action.label;
+
+  button.style.cssText =
+    'padding:9px 12px;' +
+    'border:1px solid #c9dce9;' +
+    'border-radius:10px;' +
+    'background:#eaf3f9;' +
+    'color:#405c73;' +
+    'font-size:13px;' +
+    'cursor:pointer;';
+
+  button.addEventListener('click', function() {
+
+    alert(
+      '🧪 LIYU 2.0 TEST\n\n' +
+      '訂單：' + (order.productName || '未命名商品') + '\n' +
+      '操作：修改' + action.type + '狀態\n\n' +
+      '目前為安全測試模式，尚未開放資料修改。'
+    );
+
+  });
+
+  actionBox.appendChild(button);
+
+});
+
+card.appendChild(actionBox);
   detailContent.appendChild(card);
 
 });
