@@ -660,7 +660,8 @@ try {
       '｜總額：NT$' + order.totalAmount +
       '｜付款：' + (order.paymentStatus || '—') +
       '｜到貨：' + (order.orderStatus || '—') +
-      '｜購買：' + (order.purchaseStatus || '—');
+      '｜購買：' + (order.purchaseStatus || '—') +
+      '｜取消：' + (order.cancelled === true ? '🚫 已取消' : '未取消');
 
     detailContent.appendChild(row);
   });
