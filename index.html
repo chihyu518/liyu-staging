@@ -681,7 +681,7 @@ orderData.orders.forEach(function(order) {
   info.textContent =
     '👤 買家：' +
     (order.buyerName
-      ? order.buyerName.split(' | ')[0].trim()
+      ? order.buyerName.split(/\s*[|｜]\s*/)[0].trim()
       : '—') + '\n' +
     '🔢 數量：' + order.quantity + '\n' +
     '💰 總金額：NT$' + order.totalAmount;
