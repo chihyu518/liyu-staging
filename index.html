@@ -310,6 +310,127 @@ async function liyu2GetGroupBuyOrdersFromGas(activityId) {
 
   return result.data;
 }
+  // ========================================
+// LIYU 2.0 TEST｜訂單狀態唯讀安全預檢
+// 不修改訂單、不建立 PENDING
+// ========================================
+
+async function liyu2PreflightOrderStatusFromGas(
+  activityId,
+  orderId,
+  field,
+  newStatus,
+  expectedStatus
+) {
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  // ① 驗證活動 ID 與訂單 ID
+  if (
+    typeof activityId !== 'string' ||
+    !uuidPattern.test(activityId) ||
+    typeof orderId !== 'string' ||
+    !uuidPattern.test(orderId)
+  ) {
+    throw new Error('TEST 活動或訂單 ID 格式不正確');
+  }
+
+  // ② 驗證狀態參數
+  const allowedFields = {
+    paymentStatus: [
+      '未付款',
+      '已付款',
+      '已付款(需二補)',
+      '已付款(免二補)'
+    ],
+    orderStatus: [
+      '未到貨',
+      '已到貨',
+      '已交付'
+    ],
+    purchaseStatus: [
+      '尚未購買',
+      '已購買'
+    ]
+  };
+
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      allowedFields,
+      field
+    ) ||
+    !allowedFields[field].includes(newStatus) ||
+    !allowedFields[field].includes(expectedStatus) ||
+    newStatus === expectedStatus
+  ) {
+    throw new Error('訂單狀態參數不正確');
+  }
+
+  // ③ 取得 Firebase 登入憑證
+  const currentUid = auth.currentUser?.uid;
+
+  if (!currentUid) {
+    throw new Error('請先登入 Firebase');
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  if (auth.currentUser?.uid !== currentUid) {
+    throw new Error('登入帳號已變更，請重新操作');
+  }
+
+  // ④ 呼叫 TEST GAS 唯讀預檢 API
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2PreflightOrderStatus',
+      idToken: idToken,
+      activityId: activityId,
+      orderId: orderId,
+      field: field,
+      newStatus: newStatus,
+      expectedStatus: expectedStatus
+    }),
+    redirect: 'follow'
+  });
+
+  if (auth.currentUser?.uid !== currentUid) {
+    throw new Error('登入帳號已變更，請重新操作');
+  }
+
+  if (!response.ok) {
+    throw new Error('TEST 訂單預檢 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  // ⑤ 嚴格驗證 GAS 回傳資料
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    result.data.validationOnly !== true ||
+    result.data.written !== false ||
+    result.data.pendingCreated !== false ||
+    String(result.data.activityId).toLowerCase() !==
+      activityId.toLowerCase() ||
+    String(result.data.orderId).toLowerCase() !==
+      orderId.toLowerCase() ||
+    result.data.field !== field ||
+    result.data.previousStatus !== expectedStatus ||
+    result.data.requestedStatus !== newStatus
+  ) {
+    throw new Error('TEST 訂單狀態安全預檢未通過');
+  }
+
+  // ⑥ 僅回傳預檢結果
+  return result.data;
+}
   async function liyu2GetGroupBuyDetailFromGas(activityId) {
 
   // 確認活動 ID 格式
