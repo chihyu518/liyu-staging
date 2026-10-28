@@ -259,7 +259,58 @@ async function liyu2GetProductsFromGas(activityId) {
   return result.data.products;
 }
   // LIYU 2.0 TEST｜讀取指定代購活動詳細資料（唯讀）
-async function liyu2GetGroupBuyDetailFromGas(activityId) {
+// ========================================
+// LIYU 2.0 TEST｜讀取代購訂單列表（唯讀）
+// ========================================
+async function liyu2GetGroupBuyOrdersFromGas(activityId) {
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    typeof activityId !== 'string' ||
+    !uuidPattern.test(activityId)
+  ) {
+    throw new Error('活動 ID 格式不正確');
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2GetGroupBuyOrders',
+      idToken: idToken,
+      activityId: activityId
+    }),
+    redirect: 'follow'
+  });
+
+  if (!response.ok) {
+    throw new Error('TEST 訂單 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    result.data.activityId !== activityId ||
+    !['OWNER', 'SELF'].includes(result.data.access) ||
+    !Array.isArray(result.data.orders) ||
+    result.data.total !== result.data.orders.length
+  ) {
+    throw new Error('TEST 訂單列表資料驗證失敗');
+  }
+
+  return result.data;
+}
+  async function liyu2GetGroupBuyDetailFromGas(activityId) {
 
   // 確認活動 ID 格式
   if (
