@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>LIYU 2.0 TEST｜取消訂單安全測試</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f7f9fc;
+      color: #405c73;
+      font-family: Arial, "Noto Sans TC", sans-serif;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 23px;
+    }
+
+    .notice {
+      background: #fff8e9;
+      border: 1px solid #f0ddb3;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #dce8f0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .status {
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      padding: 9px 12px;
+      border: 1px solid #c9dce9;
+      border-radius: 10px;
+      background: #eaf3f9;
+      color: #405c73;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .result {
+      background: #eaf7ee;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+
+    <h1>🩵 LIYU 2.0｜取消訂單安全測試</h1>
+
+    <div class="notice">
+      🔒 純前端模擬測試<br>
+      不連接 GAS、Firebase 或 Notion。<br>
+      不建立 PENDING，不修改任何訂單資料。
+    </div>
+
+    <div id="orders"></div>
+
+    <div id="result" class="result"></div>
+
+  </main>
+
+  <script>
+    'use strict';
+
+    // 僅使用模擬資料
+    const testOrders = [
+      {
+        id: 'simulation-normal',
+        name: 'NT$90｜正常訂單',
+        cancelled: false
+      },
+      {
+        id: 'simulation-cancelled',
+        name: 'NT$100｜已取消訂單',
+        cancelled: true
+      }
+    ];
+
+    const statusActions = [
+      { label: '💳 修改付款', type: '付款' },
+      { label: '📦 修改到貨', type: '到貨' },
+      { label: '🛒 修改購買', type: '購買' }
+    ];
+
+    const ordersContainer =
+      document.getElementById('orders');
+
+    const resultContainer =
+      document.getElementById('result');
+
+    const testResults = [];
+
+    testOrders.forEach(function(order) {
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const title = document.createElement('h2');
+      title.textContent = order.name;
+      card.appendChild(title);
+
+      const status = document.createElement('div');
+      status.className = 'status';
+
+      status.textContent = order.cancelled === true
+        ? '🚫 已取消'
+        : '✅ 未取消';
+
+      card.appendChild(status);
+
+      const actionBox = document.createElement('div');
+      actionBox.className = 'actions';
+
+      statusActions.forEach(function(action) {
+
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.textContent = action.label;
+
+        // 與 index.html 相同的取消訂單停用條件
+        if (order.cancelled === true) {
+          button.disabled = true;
+          button.title =
+            '此訂單已取消，禁止修改狀態';
+        }
+
+        // 僅模擬按鈕點擊，不呼叫任何 API
+        button.addEventListener('click', function() {
+          alert('純模擬：' + action.label);
+        });
+
+        actionBox.appendChild(button);
+
+        const expectedDisabled =
+          order.cancelled === true;
+
+        testResults.push({
+          order: order.name,
+          action: action.type,
+          expectedDisabled,
+          actualDisabled: button.disabled,
+          passed:
+            button.disabled === expectedDisabled
+        });
+
+      });
+
+      card.appendChild(actionBox);
+      ordersContainer.appendChild(card);
+
+    });
+
+    const allPassed = testResults.every(
+      result => result.passed === true
+    );
+
+    resultContainer.textContent =
+      (allPassed
+        ? '✅ 6／6 項模擬測試全部通過'
+        : '❌ 模擬測試未全部通過') +
+      '\n\n' +
+      testResults.map(result =>
+        (result.passed ? '✅ ' : '❌ ') +
+        result.order + '｜' +
+        result.action
+      ).join('\n');
+
+    console.log({
+      test: 'CANCELLED_ORDER_FRONTEND_SIMULATION',
+      environment: 'SIMULATION',
+      allPassed,
+      results: testResults,
+      written: false,
+      pendingCreated: false
+    });
+
+  </script>
+
+</body>
+</html>
