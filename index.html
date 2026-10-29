@@ -1046,15 +1046,34 @@ button.addEventListener('click', function() {
       return;
     }
 
-    // 安全測試：不呼叫任何 API
-    alert(
-      '🧪 LIYU 2.0 TEST\n\n' +
-      '操作：修改' + action.type + '狀態\n' +
-      '目前狀態：' + currentStatus + '\n' +
-      '選擇狀態：' + select.value + '\n\n' +
-      '安全測試成功！\n' +
-      '尚未修改 Notion 資料。'
-    );
+    // LIYU 2.0 TEST｜安全測試與按鈕鎖定
+// 目前不呼叫 GAS、不修改 Notion
+
+confirmButton.disabled = true;
+confirmButton.textContent = '安全檢查中…';
+confirmButton.style.opacity = '0.6';
+confirmButton.style.cursor = 'not-allowed';
+
+try {
+
+  alert(
+    '🧪 LIYU 2.0 TEST\n\n' +
+    '操作：修改' + action.type + '狀態\n' +
+    '目前狀態：' + currentStatus + '\n' +
+    '選擇狀態：' + select.value + '\n\n' +
+    '安全測試成功！\n' +
+    '尚未修改 Notion 資料。'
+  );
+
+} finally {
+
+  // 無論測試結果如何，都恢復按鈕
+  confirmButton.disabled = false;
+  confirmButton.textContent = '確認修改';
+  confirmButton.style.opacity = '1';
+  confirmButton.style.cursor = 'pointer';
+
+}
 
   });
 
