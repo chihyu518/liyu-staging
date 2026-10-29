@@ -852,7 +852,13 @@ statusActions.forEach(function(action) {
 
   button.type = 'button';
   button.textContent = action.label;
-
+  
+// LIYU 2.0 TEST｜已取消訂單禁止修改狀態
+if (order.cancelled === true) {
+  button.disabled = true;
+  button.title = '此訂單已取消，禁止修改狀態';
+}
+  
   button.style.cssText =
     'padding:9px 12px;' +
     'border:1px solid #c9dce9;' +
