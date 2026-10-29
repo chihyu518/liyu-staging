@@ -1031,6 +1031,11 @@ button.addEventListener('click', function() {
 
   confirmButton.addEventListener('click', function() {
 
+  // LIYU 2.0 TEST｜防止重複操作
+  if (confirmButton.disabled) {
+    return;
+  }
+
     if (!select.value) {
       alert('請先選擇' + action.type + '狀態');
       return;
