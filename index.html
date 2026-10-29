@@ -1056,13 +1056,38 @@ confirmButton.style.cursor = 'not-allowed';
 
 try {
 
+  // LIYU 2.0 TEST｜唯讀安全預檢
+  // 不呼叫訂單寫入 API
+
+  const selectedStatus = select.value;
+
+  const preflightResult =
+    await liyu2PreflightOrderStatusFromGas(
+      activity.id,
+      order.id,
+      config.field,
+      selectedStatus,
+      currentStatus
+    );
+
   alert(
-    '🧪 LIYU 2.0 TEST\n\n' +
+    '🧪 LIYU 2.0 TEST｜唯讀預檢成功\n\n' +
     '操作：修改' + action.type + '狀態\n' +
-    '目前狀態：' + currentStatus + '\n' +
-    '選擇狀態：' + select.value + '\n\n' +
-    '安全測試成功！\n' +
-    '尚未修改 Notion 資料。'
+    '目前狀態：' + preflightResult.previousStatus + '\n' +
+    '選擇狀態：' + preflightResult.requestedStatus + '\n\n' +
+    '✅ Firebase 權限與訂單資料預檢通過\n' +
+    '🔒 尚未修改 Notion 資料\n' +
+    '🔒 未建立 PENDING 紀錄'
+  );
+
+} catch (error) {
+
+  console.error('LIYU 2.0 TEST 預檢失敗：', error);
+
+  alert(
+    '❌ LIYU 2.0 TEST｜唯讀預檢失敗\n\n' +
+    (error?.message || '未知錯誤') +
+    '\n\n訂單狀態未透過此操作修改。'
   );
 
 } finally {
