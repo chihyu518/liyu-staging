@@ -707,6 +707,29 @@ const createGroupBuyButton =
 
 if (createGroupBuyButton) {
   createGroupBuyButton.hidden = false;
+
+  createGroupBuyButton.addEventListener("click", () => {
+    const createSection = document.getElementById(
+      "liyu2CreateGroupBuySection"
+    );
+
+    if (!createSection) return;
+
+    const willOpen = createSection.hidden;
+
+    createSection.hidden = !willOpen;
+
+    createGroupBuyButton.textContent = willOpen
+      ? "✕ 關閉新增表單"
+      : "＋ 新增代購活動";
+
+    if (willOpen) {
+      createSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  });
 }
       showStatus(
         '✅ LIYU TEST 管理員驗證成功！歡迎 ' +
