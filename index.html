@@ -856,9 +856,17 @@ if (
   ) ||
   result.data.name !== name
 ) {
+
+  // API 未確認成功，先標記為結果不明
+  liyu2UpdateCreateGroupBuyRequestStatus(
+    requestId,
+    "UNKNOWN"
+  );
+
   throw new Error(
     "TEST 新增代購：API 未確認成功建立活動，" +
-    "請先檢查 TEST 資料庫，勿直接重試。"
+    "請先檢查 TEST 資料庫及請求紀錄，" +
+    "禁止直接重新新增。"
   );
 }
 
