@@ -425,6 +425,29 @@ function liyu2LoadCreateGroupBuyRequest() {
     return null;
   }
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜比對新增活動請求資料
+// ========================================
+
+function liyu2IsSameCreateGroupBuyRequest(
+  record,
+  name,
+  mode,
+  deadline
+) {
+
+  if (!record || !auth.currentUser?.uid) {
+    return false;
+  }
+
+  return (
+    record.uid === auth.currentUser.uid &&
+    record.name === name &&
+    record.mode === mode &&
+    record.deadline === deadline
+  );
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
