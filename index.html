@@ -337,6 +337,86 @@ async function liyu2VerifyCurrentUserWithGas() {
     isAdmin: result.data.isAdmin === true
   };
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜驗證新增代購活動
+// 僅驗證，不寫入 Notion
+// ========================================
+
+async function liyu2ValidateCreateGroupBuyFromGas() {
+
+  const name = document
+    .getElementById("liyu2CreateGroupBuyName")
+    .value.trim();
+
+  const deadline = document
+    .getElementById("liyu2CreateGroupBuyDeadline")
+    .value;
+
+  const mode = document
+    .getElementById("liyu2CreateGroupBuyMode")
+    .value;
+
+  if (!name || name.length > 100) {
+    throw new Error("請輸入有效的代購活動名稱");
+  }
+
+  if (!["一般代購", "連線代購"].includes(mode)) {
+    throw new Error("請選擇有效的代購模式");
+  }
+
+  const currentUid = auth.currentUser?.uid;
+
+  if (!currentUid) {
+    throw new Error("請先登入 Firebase");
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const response = await fetch(window.API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      action: "liyu2ValidateCreateGroupBuy",
+      idToken: idToken,
+      data: {
+        name: name,
+        deadline: deadline,
+        mode: mode
+      }
+    }),
+    redirect: "follow"
+  });
+
+  if (auth.currentUser?.uid !== currentUid) {
+    throw new Error("登入帳號已變更，請重新操作");
+  }
+
+  if (!response.ok) {
+    throw new Error("TEST 新增代購驗證 API 連線失敗");
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== "TEST" ||
+    !result.data ||
+    result.data.validationOnly !== true ||
+    result.data.written !== false ||
+    result.data.notionWritten !== false ||
+    result.data.name !== name ||
+    result.data.mode !== mode ||
+    result.data.deadline !== deadline
+  ) {
+    throw new Error("TEST 新增代購資料驗證未通過");
+  }
+
+  return result.data;
+}
   
 // LIYU 2.0 TEST｜讀取目前登入者的代購活動
 async function liyu2GetMyGroupBuysFromGas() {
