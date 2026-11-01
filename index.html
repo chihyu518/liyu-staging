@@ -386,6 +386,45 @@ function liyu2SaveCreateGroupBuyRequestId(
 
   return record;
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜讀取新增活動請求紀錄
+// ========================================
+
+function liyu2LoadCreateGroupBuyRequest() {
+
+  const saved = sessionStorage.getItem(
+    LIYU2_CREATE_GROUPBUY_REQUEST_KEY
+  );
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    const record = JSON.parse(saved);
+
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (
+      !record ||
+      typeof record.requestId !== "string" ||
+      !uuidPattern.test(record.requestId) ||
+      typeof record.uid !== "string" ||
+      typeof record.name !== "string" ||
+      typeof record.mode !== "string" ||
+      typeof record.deadline !== "string"
+    ) {
+      return null;
+    }
+
+    return record;
+
+  } catch (error) {
+    return null;
+  }
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
