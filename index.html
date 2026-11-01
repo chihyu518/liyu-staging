@@ -494,6 +494,31 @@ function liyu2GetOrCreateGroupBuyRequestId(
 
   return requestId;
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜新增活動請求狀態保護
+// ========================================
+
+function liyu2AssertCreateGroupBuyRequestSafe(
+  record
+) {
+
+  if (!record) {
+    throw new Error(
+      "TEST 新增代購：找不到有效請求紀錄"
+    );
+  }
+
+  if (record.status !== "PREPARED") {
+    throw new Error(
+      "TEST 新增代購：此請求狀態為 " +
+      record.status +
+      "，請先確認 TEST 資料庫及請求紀錄，禁止直接重新新增"
+    );
+  }
+
+  return true;
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
