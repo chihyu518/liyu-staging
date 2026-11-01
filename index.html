@@ -620,6 +620,10 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
 
 async function liyu2TestCreateGroupBuyRoute() {
 
+  // LIYU 2.0 TEST｜暫時提供 Console 安全測試入口
+window.liyu2TestCreateGroupBuyRoute =
+  liyu2TestCreateGroupBuyRoute;
+  
   const currentUid = auth.currentUser?.uid;
 
   if (!currentUid) {
