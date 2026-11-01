@@ -801,9 +801,22 @@ if (auth.currentUser?.uid !== currentUid) {
   );
 }
 
+// ========================================
+// LIYU 2.0 TEST｜HTTP 回應異常保護
+// ========================================
+
 if (!response.ok) {
+
+  liyu2UpdateCreateGroupBuyRequestStatus(
+    requestId,
+    "UNKNOWN"
+  );
+
   throw new Error(
-    "TEST 新增代購：API 連線失敗，請勿直接重試"
+    "TEST 新增代購：API 回傳 HTTP " +
+    response.status +
+    "，無法確認活動是否已建立。" +
+    "請先檢查 TEST 資料庫及請求紀錄，禁止直接重試。"
   );
 }
 
