@@ -584,7 +584,13 @@ if (message) message.textContent = '等待讀取 TEST 代購活動…';
     }
 
     if (verified.isAdmin === true) {
+      
+const createGroupBuyButton =
+  document.getElementById("liyu2CreateGroupBuyButton");
 
+if (createGroupBuyButton) {
+  createGroupBuyButton.hidden = false;
+}
       showStatus(
         '✅ LIYU TEST 管理員驗證成功！歡迎 ' +
         (verified.displayName || 'Yu') +
