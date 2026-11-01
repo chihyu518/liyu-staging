@@ -345,6 +345,17 @@ async function liyu2VerifyCurrentUserWithGas() {
 
   // LIYU 2.0 TEST｜新增代購活動請求編號
 let liyu2CreateGroupBuyRequestId = null;
+
+  // LIYU 2.0 TEST｜取得新增活動請求編號
+function liyu2GetCreateGroupBuyRequestId() {
+
+  if (!liyu2CreateGroupBuyRequestId) {
+    liyu2CreateGroupBuyRequestId =
+      crypto.randomUUID();
+  }
+
+  return liyu2CreateGroupBuyRequestId;
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
