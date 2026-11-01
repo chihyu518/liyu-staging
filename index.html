@@ -439,6 +439,33 @@ async function liyu2ValidateCreateGroupBuyFromGas() {
 
 async function liyu2CreateGroupBuyFromGas() {
 
+  // 取得活動資料
+  const name = document
+    .getElementById("liyu2CreateGroupBuyName")
+    .value.trim();
+
+  const deadline = document
+    .getElementById("liyu2CreateGroupBuyDeadline")
+    .value;
+
+  const mode = document
+    .getElementById("liyu2CreateGroupBuyMode")
+    .value;
+
+  // 檢查活動資料
+  if (!name || name.length > 100) {
+    throw new Error("請輸入有效的代購活動名稱");
+  }
+
+  if (!["一般代購", "連線代購"].includes(mode)) {
+    throw new Error("請選擇有效的代購模式");
+  }
+
+  // 取得同一次新增操作的固定編號
+  const requestId =
+    liyu2GetCreateGroupBuyRequestId();
+
+  // 暫時不送出 API
   throw new Error(
     "TEST 新增代購：儲存功能尚未開放"
   );
