@@ -957,9 +957,15 @@ async function liyu2TestCreateGroupBuyRoute() {
       "Content-Type": "text/plain;charset=utf-8"
     },
     body: JSON.stringify({
-      action: "liyu2CreateGroupBuy",
-      idToken: idToken
-    }),
+  action: "liyu2CreateGroupBuy",
+  idToken: idToken,
+  requestId: crypto.randomUUID(),
+  data: {
+    name: "LIYU TEST 安全路由驗證",
+    mode: "一般代購",
+    deadline: "2026-12-31"
+  }
+}),
     redirect: "follow"
   });
 
