@@ -448,6 +448,49 @@ function liyu2IsSameCreateGroupBuyRequest(
     record.deadline === deadline
   );
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜取得或保存活動請求編號
+// ========================================
+
+function liyu2GetOrCreateGroupBuyRequestId(
+  name,
+  mode,
+  deadline
+) {
+
+  if (!auth.currentUser?.uid) {
+    throw new Error("請先登入 TEST 帳號");
+  }
+
+  const saved = liyu2LoadCreateGroupBuyRequest();
+
+  if (
+    saved &&
+    liyu2IsSameCreateGroupBuyRequest(
+      saved,
+      name,
+      mode,
+      deadline
+    )
+  ) {
+    liyu2CreateGroupBuyRequestId = saved.requestId;
+    return saved.requestId;
+  }
+
+  const requestId = crypto.randomUUID();
+
+  liyu2SaveCreateGroupBuyRequestId(
+    requestId,
+    name,
+    mode,
+    deadline
+  );
+
+  liyu2CreateGroupBuyRequestId = requestId;
+
+  return requestId;
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
