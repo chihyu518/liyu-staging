@@ -981,6 +981,90 @@ window.liyu2TestCheckGroupBuyRequest = async function () {
 
   return result;
 };
+
+  // ========================================
+// LIYU 2.0 TEST｜首次新增活動專用驗收
+// 僅允許固定活動與固定 requestId
+// ========================================
+
+window.liyu2FirstGroupBuyWriteTest = async function () {
+
+  // 首次驗收入口預設關閉
+  const firstWriteTestEnabled = false;
+
+  if (!firstWriteTestEnabled) {
+    throw new Error(
+      "TEST 首次新增活動驗收入口尚未開放"
+    );
+  }
+
+  const requestId =
+    "8c64c6e9-5a1b-4b7e-9d23-0f6e2a9b7145";
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("請先登入 TEST 管理員");
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const payload = {
+    action: "liyu2CreateGroupBuy",
+    idToken: idToken,
+    requestId: requestId,
+    data: {
+      name: "LIYU TEST 新增活動驗收 01",
+      mode: "一般代購",
+      deadline: "2026-12-31"
+    }
+  };
+
+  const response = await fetch(window.API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload),
+    redirect: "follow"
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      "TEST 寫入 API HTTP 錯誤：" + response.status +
+      "。請先查詢請求狀態，禁止直接重試。"
+    );
+  }
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error(
+      "TEST 寫入結果無法解析，禁止直接重試。"
+    );
+  }
+
+  if (
+    result.success !== true ||
+    result.environment !== "TEST" ||
+    result.data?.written !== true ||
+    result.data?.notionWritten !== true ||
+    !result.data?.activityId
+  ) {
+    throw new Error(
+      "TEST 寫入未確認成功，請先查詢請求狀態，禁止直接重試。"
+    );
+  }
+
+  console.log(
+    "✅ TEST 首次新增活動成功：",
+    result
+  );
+
+  return result;
+};
   
   // ========================================
 // LIYU 2.0 TEST｜新增活動 API 安全測試
