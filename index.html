@@ -933,6 +933,56 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
 }
 
   // ========================================
+// LIYU 2.0 TEST｜查詢活動建立請求
+// 唯讀，不寫入 Notion
+// ========================================
+
+window.liyu2TestCheckGroupBuyRequest = async function () {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("請先登入 TEST 管理員帳號");
+  }
+
+  const idToken = await user.getIdToken();
+
+  const payload = {
+    action: "liyu2CheckGroupBuyRequest",
+    idToken: idToken,
+    requestId: "00000000-0000-4000-8000-000000000001"
+  };
+
+  const response = await fetch(window.API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload),
+    redirect: "follow"
+  });
+
+  if (!response.ok) {
+    throw new Error("查詢 API HTTP 錯誤：" + response.status);
+  }
+
+  const result = await response.json();
+
+  if (
+    result.success !== true ||
+    result.environment !== "TEST" ||
+    !result.data ||
+    result.data.requestId !== payload.requestId
+  ) {
+    throw new Error("TEST 查詢 API 回傳格式異常");
+  }
+
+  console.log("✅ TEST 請求查詢 API 回傳：", result);
+
+  return result;
+};
+  
+  // ========================================
 // LIYU 2.0 TEST｜新增活動 API 安全測試
 // 僅測試目前尚未開放的路由
 // ========================================
