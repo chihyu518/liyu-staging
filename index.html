@@ -653,6 +653,29 @@ if (auth.currentUser?.uid !== currentUid) {
     deadline
   );
 
+  // LIYU 2.0 TEST｜確認新增請求尚未送出
+const savedCreateRequest =
+  liyu2LoadCreateGroupBuyRequest();
+
+if (
+  !savedCreateRequest ||
+  savedCreateRequest.requestId !== requestId ||
+  !liyu2IsSameCreateGroupBuyRequest(
+    savedCreateRequest,
+    name,
+    mode,
+    deadline
+  )
+) {
+  throw new Error(
+    "TEST 新增代購：請求資料不一致，禁止送出"
+  );
+}
+
+liyu2AssertCreateGroupBuyRequestSafe(
+  savedCreateRequest
+);
+  
   // ========================================
 // LIYU 2.0 TEST｜準備新增活動 API 資料
 // ========================================
