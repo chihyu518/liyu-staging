@@ -619,10 +619,6 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
 // ========================================
 
 async function liyu2TestCreateGroupBuyRoute() {
-
-  // LIYU 2.0 TEST｜暫時提供 Console 安全測試入口
-window.liyu2TestCreateGroupBuyRoute =
-  liyu2TestCreateGroupBuyRoute;
   
   const currentUid = auth.currentUser?.uid;
 
@@ -678,6 +674,10 @@ window.liyu2TestCreateGroupBuyRoute =
     notionWritten: false
   };
 }
+
+  // LIYU 2.0 TEST｜Console 安全測試入口
+window.liyu2TestCreateGroupBuyRoute =
+  liyu2TestCreateGroupBuyRoute;
   
 // LIYU 2.0 TEST｜讀取目前登入者的代購活動
 async function liyu2GetMyGroupBuysFromGas() {
