@@ -461,6 +461,27 @@ async function liyu2CreateGroupBuyFromGas() {
     throw new Error("請選擇有效的代購模式");
   }
 
+  // ========================================
+// LIYU 2.0 TEST｜Firebase 登入驗證
+// ========================================
+
+const currentUid = auth.currentUser?.uid;
+
+if (!currentUid) {
+  throw new Error(
+    "請先登入 Firebase，才能新增代購活動"
+  );
+}
+
+const idToken =
+  await liyu2GetCurrentIdToken();
+
+if (auth.currentUser?.uid !== currentUid) {
+  throw new Error(
+    "登入帳號已變更，請重新操作"
+  );
+}
+  
   // 取得同一次新增操作的固定編號
   const requestId =
     liyu2GetCreateGroupBuyRequestId();
