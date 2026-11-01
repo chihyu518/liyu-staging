@@ -619,7 +619,11 @@ if (auth.currentUser?.uid !== currentUid) {
   
   // 取得同一次新增操作的固定編號
   const requestId =
-    liyu2GetCreateGroupBuyRequestId();
+  liyu2GetOrCreateGroupBuyRequestId(
+    name,
+    mode,
+    deadline
+  );
 
   // ========================================
 // LIYU 2.0 TEST｜準備新增活動 API 資料
