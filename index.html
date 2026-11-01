@@ -486,6 +486,21 @@ if (auth.currentUser?.uid !== currentUid) {
   const requestId =
     liyu2GetCreateGroupBuyRequestId();
 
+  // ========================================
+// LIYU 2.0 TEST｜準備新增活動 API 資料
+// ========================================
+
+const createPayload = {
+  action: "liyu2CreateGroupBuy",
+  idToken: idToken,
+  requestId: requestId,
+  data: {
+    name: name,
+    deadline: deadline,
+    mode: mode
+  }
+};
+  
   // 暫時不送出 API
   throw new Error(
     "TEST 新增代購：儲存功能尚未開放"
