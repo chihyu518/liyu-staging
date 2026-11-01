@@ -519,6 +519,60 @@ function liyu2AssertCreateGroupBuyRequestSafe(
 
   return true;
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜更新新增活動請求狀態
+// ========================================
+
+function liyu2UpdateCreateGroupBuyRequestStatus(
+  requestId,
+  nextStatus
+) {
+
+  const record =
+    liyu2LoadCreateGroupBuyRequest();
+
+  if (
+    !record ||
+    record.requestId !== requestId ||
+    record.uid !== auth.currentUser?.uid
+  ) {
+    throw new Error(
+      "TEST 新增代購：請求紀錄不一致，禁止更新狀態"
+    );
+  }
+
+  const allowedTransitions = {
+    PREPARED: ["PENDING"],
+    PENDING: ["COMPLETED", "UNKNOWN"],
+    UNKNOWN: [],
+    COMPLETED: []
+  };
+
+  if (
+    !allowedTransitions[record.status]
+      ?.includes(nextStatus)
+  ) {
+    throw new Error(
+      "TEST 新增代購：不允許從 " +
+      record.status +
+      " 變更為 " +
+      nextStatus
+    );
+  }
+
+  const updatedRecord = {
+    ...record,
+    status: nextStatus
+  };
+
+  sessionStorage.setItem(
+    LIYU2_CREATE_GROUPBUY_REQUEST_KEY,
+    JSON.stringify(updatedRecord)
+  );
+
+  return updatedRecord;
+}
   
 async function liyu2ValidateCreateGroupBuyFromGas() {
 
