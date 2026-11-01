@@ -501,10 +501,43 @@ const createPayload = {
   }
 };
   
-  // 暫時不送出 API
+  // ========================================
+// LIYU 2.0 TEST｜新增活動 API 傳送
+// ========================================
+
+// 安全開關：目前禁止送出
+const createApiEnabled = false;
+
+if (!createApiEnabled) {
   throw new Error(
-    "TEST 新增代購：儲存功能尚未開放"
+    "TEST 新增代購：API 傳送功能尚未開放"
   );
+}
+
+const response = await fetch(window.API_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify(createPayload),
+  redirect: "follow"
+});
+
+if (auth.currentUser?.uid !== currentUid) {
+  throw new Error(
+    "登入帳號已變更，請重新操作"
+  );
+}
+
+if (!response.ok) {
+  throw new Error(
+    "TEST 新增代購：API 連線失敗，請勿直接重試"
+  );
+}
+
+const result = await response.json();
+
+return result;
 
 }
   
