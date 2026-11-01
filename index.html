@@ -979,17 +979,25 @@ async function liyu2TestCreateGroupBuyRoute() {
 
   const result = await response.json();
 
-  if (
-    result?.success !== false ||
-    result?.environment !== "TEST" ||
-    result?.data?.written !== false ||
-    result?.data?.notionWritten !== false ||
-    result?.message !== "TEST 新增代購 API 尚未開放"
-  ) {
-    throw new Error(
-      "TEST API 安全回應不符合預期，請檢查 GAS"
-    );
-  }
+  
+if (
+  result?.success !== true ||
+  result?.environment !== "TEST" ||
+  result?.data?.written !== false ||
+  result?.data?.notionWritten !== false ||
+  result?.message !==
+    "TEST 新增代購寫入功能尚未開放"
+) {
+  console.error(
+    "TEST API 實際回應：",
+    result
+  );
+
+  throw new Error(
+    "TEST 新增代購安全測試未通過，請檢查 GAS 回傳內容"
+  );
+}
+
 
   console.log("✅ TEST 新增活動 API 安全路由測試通過");
 
