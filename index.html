@@ -415,7 +415,9 @@ function liyu2LoadCreateGroupBuyRequest() {
       typeof record.uid !== "string" ||
       typeof record.name !== "string" ||
       typeof record.mode !== "string" ||
-      typeof record.deadline !== "string"
+      typeof record.deadline !== "string" ||
+!["PREPARED", "PENDING", "COMPLETED", "UNKNOWN"]
+  .includes(record.status)
     ) {
       return null;
     }
