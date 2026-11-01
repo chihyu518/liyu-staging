@@ -372,12 +372,13 @@ function liyu2SaveCreateGroupBuyRequestId(
 ) {
 
   const record = {
-    requestId: requestId,
-    uid: auth.currentUser?.uid || "",
-    name: name,
-    mode: mode,
-    deadline: deadline
-  };
+  requestId: requestId,
+  uid: auth.currentUser?.uid || "",
+  name: name,
+  mode: mode,
+  deadline: deadline,
+  status: "PREPARED"
+};
 
   sessionStorage.setItem(
     LIYU2_CREATE_GROUPBUY_REQUEST_KEY,
