@@ -417,6 +417,55 @@ async function liyu2ValidateCreateGroupBuyFromGas() {
 
   return result.data;
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜新增代購活動驗證按鈕
+// ========================================
+
+const liyu2ValidateCreateButton =
+  document.getElementById(
+    "liyu2ValidateCreateGroupBuyButton"
+  );
+
+const liyu2CreateResult =
+  document.getElementById(
+    "liyu2CreateGroupBuyResult"
+  );
+
+if (liyu2ValidateCreateButton && liyu2CreateResult) {
+
+  liyu2ValidateCreateButton.addEventListener(
+    "click",
+    async function() {
+
+      liyu2ValidateCreateButton.disabled = true;
+      liyu2CreateResult.textContent = "正在驗證活動資料…";
+
+      try {
+
+        const result =
+          await liyu2ValidateCreateGroupBuyFromGas();
+
+        liyu2CreateResult.textContent =
+          "✅ 活動資料驗證成功！目前尚未儲存到 Notion。";
+
+        liyu2CreateResult.style.color = "#16803c";
+
+      } catch (error) {
+
+        liyu2CreateResult.textContent =
+          "❌ " + (error.message || "驗證失敗");
+
+        liyu2CreateResult.style.color = "#b42342";
+
+      } finally {
+
+        liyu2ValidateCreateButton.disabled = false;
+
+      }
+    }
+  );
+}
   
 // LIYU 2.0 TEST｜讀取目前登入者的代購活動
 async function liyu2GetMyGroupBuysFromGas() {
