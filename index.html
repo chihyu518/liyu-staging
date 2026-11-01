@@ -537,7 +537,30 @@ if (!response.ok) {
 
 const result = await response.json();
 
-return result;
+// ========================================
+// LIYU 2.0 TEST｜確認新增活動 API 結果
+// ========================================
+
+if (
+  !result ||
+  result.success !== true ||
+  result.environment !== "TEST" ||
+  !result.data ||
+  result.data.written !== true ||
+  result.data.notionWritten !== true ||
+  typeof result.data.activityId !== "string" ||
+  !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    result.data.activityId
+  ) ||
+  result.data.name !== name
+) {
+  throw new Error(
+    "TEST 新增代購：API 未確認成功建立活動，" +
+    "請先檢查 TEST 資料庫，勿直接重試。"
+  );
+}
+
+return result.data;
 
 }
   
