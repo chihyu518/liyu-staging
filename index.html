@@ -1051,6 +1051,82 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
 
   
   // ========================================
+  // LIYU 2.0 TEST｜查詢新增活動結果按鈕
+  // ========================================
+
+  const liyu2CheckCreateButton =
+    document.getElementById(
+      "liyu2CheckCreateGroupBuyButton"
+    );
+
+  if (liyu2CheckCreateButton && liyu2CreateResult) {
+
+    liyu2CheckCreateButton.addEventListener(
+      "click",
+      async function () {
+
+        liyu2CheckCreateButton.disabled = true;
+
+        liyu2CreateResult.textContent =
+          "🔍 正在查詢新增結果…";
+
+        try {
+
+          const result =
+            await window.liyu2TestCheckGroupBuyRequest();
+
+          const data = result.data;
+
+          if (data.exists !== true) {
+
+            liyu2CreateResult.textContent =
+              "⚠️ GAS 找不到這筆請求紀錄，" +
+              "請先確認 Notion TEST 資料庫，勿直接重試。";
+
+            liyu2CreateResult.style.color = "#b45309";
+
+          } else if (
+            data.status === "COMPLETED" &&
+            typeof data.activityId === "string" &&
+            data.activityId.length > 0
+          ) {
+
+            liyu2CreateResult.textContent =
+              "✅ 活動已成功建立！活動 ID：" +
+              data.activityId;
+
+            liyu2CreateResult.style.color = "#16803c";
+
+          } else {
+
+            liyu2CreateResult.textContent =
+              "⚠️ 目前請求狀態：" +
+              (data.status || "未知") +
+              "。請確認 TEST 資料庫，勿直接重試。";
+
+            liyu2CreateResult.style.color = "#b45309";
+
+          }
+
+        } catch (error) {
+
+          liyu2CreateResult.textContent =
+            "❌ 查詢失敗：" +
+            (error.message || "未知錯誤");
+
+          liyu2CreateResult.style.color = "#b42342";
+
+        } finally {
+
+          liyu2CheckCreateButton.disabled = false;
+
+        }
+      }
+    );
+  }
+
+  
+  // ========================================
 // LIYU 2.0 TEST｜查詢活動建立請求
 // 唯讀，不寫入 Notion
 // ========================================
