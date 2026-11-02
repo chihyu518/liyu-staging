@@ -1043,13 +1043,28 @@ window.liyu2TestCheckGroupBuyRequest = async function () {
     throw new Error("請先登入 TEST 管理員帳號");
   }
 
-  const idToken = await user.getIdToken();
+  
+const idToken = await user.getIdToken();
 
-  const payload = {
-    action: "liyu2CheckGroupBuyRequest",
-    idToken: idToken,
-    requestId: "00000000-0000-4000-8000-000000000001"
-  };
+// 讀取目前新增活動的請求紀錄
+const savedRequest =
+  liyu2LoadCreateGroupBuyRequest();
+
+if (
+  !savedRequest ||
+  savedRequest.uid !== user.uid
+) {
+  throw new Error(
+    "TEST 新增代購：找不到目前帳號的請求紀錄"
+  );
+}
+
+const payload = {
+  action: "liyu2CheckGroupBuyRequest",
+  idToken: idToken,
+  requestId: savedRequest.requestId
+};
+
 
   const response = await fetch(window.API_URL, {
     method: "POST",
