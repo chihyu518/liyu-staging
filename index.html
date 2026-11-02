@@ -954,6 +954,63 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
   );
 }
 
+  
+  // ========================================
+  // LIYU 2.0 TEST｜管理員儲存代購活動
+  // ========================================
+
+  const liyu2SaveCreateButton =
+    document.getElementById(
+      "liyu2SaveCreateGroupBuyButton"
+    );
+
+  if (liyu2SaveCreateButton && liyu2CreateResult) {
+
+    liyu2SaveCreateButton.addEventListener(
+      "click",
+      async function () {
+
+        // 管理員儲存功能尚未正式開放
+        const adminSaveEnabled = false;
+
+        if (!adminSaveEnabled) {
+          liyu2CreateResult.textContent =
+            "🔒 儲存功能尚未開放";
+          return;
+        }
+
+        liyu2SaveCreateButton.disabled = true;
+
+        try {
+
+          liyu2CreateResult.textContent =
+            "正在儲存代購活動…";
+
+          const result =
+            await liyu2CreateGroupBuyFromGas();
+
+          liyu2CreateResult.textContent =
+            "✅ 代購活動已成功儲存！";
+
+          liyu2CreateResult.style.color = "#16803c";
+
+        } catch (error) {
+
+          liyu2CreateResult.textContent =
+            "❌ " + (error.message || "儲存失敗");
+
+          liyu2CreateResult.style.color = "#b42342";
+
+        } finally {
+
+          liyu2SaveCreateButton.disabled = false;
+
+        }
+      }
+    );
+  }
+
+  
   // ========================================
 // LIYU 2.0 TEST｜查詢活動建立請求
 // 唯讀，不寫入 Notion
