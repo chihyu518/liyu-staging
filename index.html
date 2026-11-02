@@ -393,6 +393,22 @@ function liyu2SaveCreateGroupBuyRequestId(
   deadline
 ) {
 
+  
+  // LIYU 2.0 TEST｜防止覆蓋尚未確認的新增請求
+  const existing = liyu2LoadCreateGroupBuyRequest();
+
+  if (
+    existing &&
+    ["PENDING", "UNKNOWN"].includes(existing.status)
+  ) {
+    throw new Error(
+      "TEST 新增代購：上一筆請求尚未確認結果，" +
+      "請先檢查 TEST 資料庫及請求紀錄，" +
+      "禁止建立新的新增請求。"
+    );
+  }
+
+  
   const record = {
   requestId: requestId,
   uid: auth.currentUser?.uid || "",
