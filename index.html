@@ -506,15 +506,18 @@ function liyu2GetOrCreateGroupBuyRequestId(
 
   const saved = liyu2LoadCreateGroupBuyRequest();
 
-  if (
-    saved &&
-    liyu2IsSameCreateGroupBuyRequest(
-      saved,
-      name,
-      mode,
-      deadline
-    )
-  ) {
+  
+if (
+  saved &&
+  saved.status !== "COMPLETED" &&
+  liyu2IsSameCreateGroupBuyRequest(
+    saved,
+    name,
+    mode,
+    deadline
+  )
+) {
+
     liyu2CreateGroupBuyRequestId = saved.requestId;
     return saved.requestId;
   }
