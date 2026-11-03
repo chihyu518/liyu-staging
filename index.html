@@ -999,6 +999,20 @@ if (
         
         liyu2CreateResult.textContent =
           "✅ 活動資料驗證成功！目前尚未儲存到 Notion。";
+     
+if (liyu2SaveCreateButton) {
+
+  const savedRequest =
+    liyu2LoadCreateGroupBuyRequest();
+
+  const canSave =
+    adminSaveEnabled === true &&
+    savedRequest?.status === "PREPARED" &&
+    savedRequest.uid === auth.currentUser?.uid;
+
+  liyu2SaveCreateButton.disabled = !canSave;
+
+}
 
         liyu2CreateResult.style.color = "#16803c";
 
