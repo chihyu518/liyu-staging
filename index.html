@@ -753,13 +753,11 @@ if (!currentUid) {
 
 const idToken =
   await liyu2GetCurrentIdToken();
-
+  
 if (auth.currentUser?.uid !== currentUid) {
-  // API 已送出，結果必須視為尚未確認。
-  // 保留原本的 PENDING，不允許直接重試。
   throw new Error(
-    "TEST 新增代購：API 送出後登入帳號已變更，" +
-    "請使用原帳號查詢請求結果，禁止直接重新新增。"
+    "TEST 新增代購：取得登入憑證後帳號已變更，" +
+    "尚未送出新增請求，請重新登入並驗證活動資料。"
   );
 }
   
