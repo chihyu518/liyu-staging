@@ -1159,19 +1159,13 @@ if (liyu2SaveCreateButton) {
           liyu2CreateResult.style.color = "#b42342";
 
         
+
 } finally {
 
-  const savedRequest =
-    liyu2LoadCreateGroupBuyRequest();
-
-  const canRetry =
-    adminSaveEnabled === true &&
-    savedRequest?.status === "PREPARED" &&
-    savedRequest.uid === auth.currentUser?.uid;
-
-  liyu2SaveCreateButton.disabled = !canRetry;
+  liyu2CheckCreateButton.disabled = false;
 
 }
+
 
       }
     );
