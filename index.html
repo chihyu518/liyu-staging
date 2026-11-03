@@ -972,6 +972,31 @@ if (liyu2ValidateCreateButton && liyu2CreateResult) {
         const result =
           await liyu2ValidateCreateGroupBuyFromGas();
 
+        
+const requestId =
+  liyu2GetOrCreateGroupBuyRequestId(
+    result.name,
+    result.mode,
+    result.deadline
+  );
+
+const preparedRequest =
+  liyu2LoadCreateGroupBuyRequest();
+
+liyu2AssertCreateGroupBuyRequestSafe(
+  preparedRequest
+);
+
+if (
+  preparedRequest.requestId !== requestId ||
+  preparedRequest.uid !== auth.currentUser?.uid
+) {
+  throw new Error(
+    "TEST 新增代購：請求紀錄與目前登入帳號不符"
+  );
+}
+
+        
         liyu2CreateResult.textContent =
           "✅ 活動資料驗證成功！目前尚未儲存到 Notion。";
 
