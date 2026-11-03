@@ -1072,7 +1072,21 @@ if (liyu2SaveCreateButton) {
 
           const result =
             await liyu2CreateGroupBuyFromGas();
-
+         
+if (
+  !result ||
+  result.written !== true ||
+  result.notionWritten !== true ||
+  typeof result.activityId !== "string" ||
+  !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    result.activityId
+  )
+) {
+  throw new Error(
+    "TEST 新增代購：尚未確認 Notion 寫入成功，" +
+    "請先查詢新增結果，禁止直接重試。"
+  );
+}
           liyu2CreateResult.textContent =
             "✅ 代購活動已成功儲存！";
 
