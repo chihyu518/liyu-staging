@@ -1028,14 +1028,14 @@ if (
       "liyu2SaveCreateGroupBuyButton"
     );
 
+  // LIYU 2.0 TEST｜管理員新增活動共用安全開關
+  const adminSaveEnabled = false;
+
   if (liyu2SaveCreateButton && liyu2CreateResult) {
 
     liyu2SaveCreateButton.addEventListener(
       "click",
       async function () {
-
-        // 管理員儲存功能尚未正式開放
-        const adminSaveEnabled = false;
 
         if (!adminSaveEnabled) {
           liyu2CreateResult.textContent =
