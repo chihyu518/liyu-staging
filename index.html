@@ -1101,9 +1101,17 @@ if (
 
         } finally {
 
-          liyu2SaveCreateButton.disabled = false;
+  const savedRequest =
+    liyu2LoadCreateGroupBuyRequest();
 
-        }
+  const canSave =
+    adminSaveEnabled === true &&
+    savedRequest?.status === "PREPARED" &&
+    savedRequest.uid === auth.currentUser?.uid;
+
+  liyu2SaveCreateButton.disabled = !canSave;
+
+}
       }
     );
   }
