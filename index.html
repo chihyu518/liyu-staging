@@ -1956,6 +1956,19 @@ async function openActivityDetail() {
 const productTitle = document.createElement('h3');
 productTitle.textContent = '📦 代購商品';
 detailContent.appendChild(productTitle);
+    
+const addProductButton = document.createElement('button');
+addProductButton.type = 'button';
+addProductButton.textContent = '＋ 新增商品';
+addProductButton.style.margin = '10px 0';
+addProductButton.style.padding = '10px 16px';
+addProductButton.style.borderRadius = '10px';
+
+addProductButton.addEventListener('click', function() {
+  alert('商品新增表單準備中 🩵');
+});
+
+detailContent.appendChild(addProductButton);
 
 const productMessage = document.createElement('p');
 productMessage.textContent = '正在讀取商品…';
