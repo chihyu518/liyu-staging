@@ -1964,9 +1964,113 @@ addProductButton.style.margin = '10px 0';
 addProductButton.style.padding = '10px 16px';
 addProductButton.style.borderRadius = '10px';
 
+
 addProductButton.addEventListener('click', function() {
-  alert('商品新增表單準備中 🩵');
+  const existingForm = document.getElementById('liyu2ProductForm');
+
+  if (existingForm) {
+    existingForm.remove();
+    return;
+  }
+
+  const form = document.createElement('form');
+  form.id = 'liyu2ProductForm';
+  form.style.padding = '16px';
+  form.style.margin = '12px 0';
+  form.style.border = '1px solid #dbeafe';
+  form.style.borderRadius = '14px';
+  form.style.background = '#f8fbff';
+
+  const title = document.createElement('h3');
+  title.textContent = '🛍️ 新增代購商品';
+  form.appendChild(title);
+
+  const fields = [
+    ['name', '商品名稱', 'text', ''],
+    ['originalPrice', '原幣價格', 'number', '0'],
+    ['exchangeRate', '換算匯率', 'number', '0.215'],
+    ['unitCostTwd', '台幣成本', 'number', '0'],
+    ['memberPriceTwd', '團員售價', 'number', '0'],
+    ['buyerPriceTwd', '買家售價', 'number', '0'],
+    ['quantityLimit', '數量上限', 'number', '1'],
+    ['note', '商品備註', 'text', '']
+  ];
+
+  const currencyLabel = document.createElement('label');
+  currencyLabel.textContent = '商品幣別';
+  currencyLabel.style.display = 'block';
+
+  const currencySelect = document.createElement('select');
+  currencySelect.name = 'currency';
+
+  ['TWD', 'JPY', 'KRW'].forEach(function(currency) {
+    const option = document.createElement('option');
+    option.value = currency;
+    option.textContent = currency;
+    currencySelect.appendChild(option);
+  });
+
+  currencySelect.value = 'JPY';
+  form.appendChild(currencyLabel);
+  form.appendChild(currencySelect);
+
+  fields.forEach(function(field) {
+    const label = document.createElement('label');
+    label.textContent = field[1];
+    label.style.display = 'block';
+    label.style.marginTop = '12px';
+
+    const input = document.createElement('input');
+    input.name = field[0];
+    input.type = field[2];
+    input.value = field[3];
+    input.required = field[0] !== 'note';
+    input.style.display = 'block';
+    input.style.width = '100%';
+    input.style.boxSizing = 'border-box';
+    input.style.padding = '9px';
+    input.style.marginTop = '5px';
+
+    if (field[2] === 'number') {
+      input.min = field[0] === 'quantityLimit' ? '1' : '0';
+      input.step = field[0] === 'quantityLimit' ? '1' : 'any';
+    }
+
+    form.appendChild(label);
+    form.appendChild(input);
+  });
+
+  const audienceLabel = document.createElement('label');
+  audienceLabel.textContent = '商品對象';
+  audienceLabel.style.display = 'block';
+  audienceLabel.style.marginTop = '12px';
+
+  const audienceSelect = document.createElement('select');
+  audienceSelect.name = 'audience';
+
+  ['👤 所有人都可以購買', '👤 指定成員'].forEach(function(value) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value;
+    audienceSelect.appendChild(option);
+  });
+
+  form.appendChild(audienceLabel);
+  form.appendChild(audienceSelect);
+
+  const message = document.createElement('p');
+  message.textContent = '目前為表單預覽，尚未開放儲存。';
+  form.appendChild(message);
+
+  const previewButton = document.createElement('button');
+  previewButton.type = 'button';
+  previewButton.textContent = '💾 儲存商品（尚未開放）';
+  previewButton.disabled = true;
+  form.appendChild(previewButton);
+
+  addProductButton.insertAdjacentElement('afterend', form);
 });
+
 
 detailContent.appendChild(addProductButton);
 
