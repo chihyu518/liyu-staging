@@ -2204,6 +2204,11 @@ audienceSelect.addEventListener('change', function() {
   previewButton.textContent = '💾 儲存商品（尚未開放）';
   previewButton.disabled = true;
   form.appendChild(previewButton);
+  
+previewButton.addEventListener('click', function() {
+  // 商品儲存功能尚未開放
+  alert('目前為 LIYU TEST 表單預覽，尚未開放商品儲存。');
+});
 
   addProductButton.insertAdjacentElement('afterend', form);
 });
