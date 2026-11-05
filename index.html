@@ -2124,16 +2124,76 @@ memberSelectionLabel.style.marginBottom = '6px';
 const memberSelectionMessage = document.createElement('p');
 memberSelectionMessage.textContent = '成員名單功能準備中，暫時無法選擇。';
 
+const memberCheckboxList = document.createElement('div');
+memberCheckboxList.style.marginTop = '10px';
+
+let membersLoaded = false;
+
+async function loadProductMembers() {
+  if (membersLoaded) return;
+
+  memberSelectionMessage.textContent = '正在讀取 TEST 成員名單…';
+  memberCheckboxList.replaceChildren();
+
+  try {
+    const members = await liyu2GetTestMembersFromGas();
+
+    // 避免切換帳號或關閉表單後顯示舊資料
+    if (!form.isConnected || !auth.currentUser) {
+      return;
+    }
+
+    membersLoaded = true;
+
+    if (members.length === 0) {
+      memberSelectionMessage.textContent = '目前沒有可選擇的 TEST 成員。';
+      return;
+    }
+
+    memberSelectionMessage.textContent =
+      '請勾選可以購買此商品的成員：';
+
+    members.forEach(function(member) {
+      const label = document.createElement('label');
+      label.style.display = 'block';
+      label.style.margin = '8px 0';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = member.id;
+      checkbox.name = 'productMemberId';
+      checkbox.style.marginRight = '8px';
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(member.name));
+
+      memberCheckboxList.appendChild(label);
+    });
+
+  } catch (error) {
+    memberSelectionMessage.textContent =
+      '⚠️ 成員名單讀取失敗：' + error.message;
+  }
+}
+
+
 memberSelectionArea.appendChild(memberSelectionLabel);
 memberSelectionArea.appendChild(memberSelectionMessage);
+memberSelectionArea.appendChild(memberCheckboxList);
 form.appendChild(memberSelectionArea);
 
 audienceSelect.addEventListener('change', function() {
+  const isSpecificMembers =
+    audienceSelect.value === '👤 指定成員';
+
   memberSelectionArea.style.display =
-    audienceSelect.value === '👤 指定成員'
-      ? 'block'
-      : 'none';
+    isSpecificMembers ? 'block' : 'none';
+
+  if (isSpecificMembers) {
+    loadProductMembers();
+  }
 });
+
 
   const message = document.createElement('p');
   message.textContent = '目前為表單預覽，尚未開放儲存。';
