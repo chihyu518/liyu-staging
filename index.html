@@ -2297,10 +2297,12 @@ function liyu2ValidateProductForm() {
 }
 
   const previewButton = document.createElement('button');
-  previewButton.type = 'button';
-  previewButton.textContent = '💾 儲存商品（尚未開放）';
-  previewButton.disabled = true;
-  form.appendChild(previewButton);
+  
+previewButton.type = 'button';
+previewButton.textContent = '🧪 驗證商品資料（不會儲存）';
+previewButton.disabled = false;
+form.appendChild(previewButton);
+
   
 
 previewButton.addEventListener('click', function() {
