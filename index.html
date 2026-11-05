@@ -2302,10 +2302,31 @@ function liyu2ValidateProductForm() {
   previewButton.disabled = true;
   form.appendChild(previewButton);
   
+
 previewButton.addEventListener('click', function() {
-  // 商品儲存功能尚未開放
-  alert('目前為 LIYU TEST 表單預覽，尚未開放商品儲存。');
+  try {
+    const productData = liyu2ValidateProductForm();
+
+    console.log('LIYU TEST 商品表單驗證通過', {
+      name: productData.name,
+      currency: productData.currency,
+      audience: productData.audience,
+      memberCount: productData.memberIds.length
+    });
+
+    alert(
+      '✅ 商品資料驗證通過！\n' +
+      '商品名稱：' + productData.name + '\n' +
+      '幣別：' + productData.currency + '\n' +
+      '指定成員數：' + productData.memberIds.length + '\n\n' +
+      '目前尚未儲存至 Notion。'
+    );
+
+  } catch (error) {
+    alert('⚠️ ' + error.message);
+  }
 });
+
 
   addProductButton.insertAdjacentElement('afterend', form);
 });
