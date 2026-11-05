@@ -2058,6 +2058,30 @@ addProductButton.addEventListener('click', function() {
   form.appendChild(audienceLabel);
   form.appendChild(audienceSelect);
 
+const memberSelectionArea = document.createElement('div');
+memberSelectionArea.id = 'liyu2ProductMemberSelection';
+memberSelectionArea.style.display = 'none';
+memberSelectionArea.style.marginTop = '12px';
+
+const memberSelectionLabel = document.createElement('label');
+memberSelectionLabel.textContent = '👥 指定購買成員';
+memberSelectionLabel.style.display = 'block';
+memberSelectionLabel.style.marginBottom = '6px';
+
+const memberSelectionMessage = document.createElement('p');
+memberSelectionMessage.textContent = '成員名單功能準備中，暫時無法選擇。';
+
+memberSelectionArea.appendChild(memberSelectionLabel);
+memberSelectionArea.appendChild(memberSelectionMessage);
+form.appendChild(memberSelectionArea);
+
+audienceSelect.addEventListener('change', function() {
+  memberSelectionArea.style.display =
+    audienceSelect.value === '👤 指定成員'
+      ? 'block'
+      : 'none';
+});
+
   const message = document.createElement('p');
   message.textContent = '目前為表單預覽，尚未開放儲存。';
   form.appendChild(message);
