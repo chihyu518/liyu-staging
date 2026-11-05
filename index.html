@@ -1526,6 +1526,59 @@ async function liyu2GetProductsFromGas(activityId) {
 
   return result.data.products;
 }
+ 
+async function liyu2GetTestMembersFromGas() {
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2GetTestMemberList',
+      idToken: idToken
+    }),
+    redirect: 'follow'
+  });
+
+  if (!response.ok) {
+    throw new Error('TEST 成員 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    !Array.isArray(result.data.members)
+  ) {
+    throw new Error('TEST 成員清單資料驗證失敗');
+  }
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  return result.data.members.map(function(member) {
+    if (
+      !member ||
+      typeof member.id !== 'string' ||
+      !uuidPattern.test(member.id) ||
+      typeof member.name !== 'string' ||
+      !member.name.trim()
+    ) {
+      throw new Error('TEST 成員資料格式不正確');
+    }
+
+    return {
+      id: member.id,
+      name: member.name.trim()
+    };
+  });
+}
+
   // LIYU 2.0 TEST｜讀取指定代購活動詳細資料（唯讀）
 // ========================================
 // LIYU 2.0 TEST｜讀取代購訂單列表（唯讀）
