@@ -2194,10 +2194,107 @@ audienceSelect.addEventListener('change', function() {
   }
 });
 
-
   const message = document.createElement('p');
   message.textContent = '目前為表單預覽，尚未開放儲存。';
   form.appendChild(message);
+
+  
+function liyu2ValidateProductForm() {
+  const data = new FormData(form);
+
+  const name = String(data.get('name') || '').trim();
+  const currency = String(data.get('currency') || '');
+  const audience = String(data.get('audience') || '');
+
+  if (!name || name.length > 200) {
+    throw new Error('商品名稱必須為 1～200 個字元');
+  }
+
+  if (!['TWD', 'JPY', 'KRW'].includes(currency)) {
+    throw new Error('商品幣別不正確');
+  }
+
+  const numericFields = [
+    'originalPrice',
+    'exchangeRate',
+    'unitCostTwd',
+    'memberPriceTwd',
+    'buyerPriceTwd',
+    'quantityLimit'
+  ];
+
+  const product = {
+    name: name,
+    currency: currency
+  };
+
+  numericFields.forEach(function(key) {
+    const raw = data.get(key);
+
+    if (raw === null || String(raw).trim() === '') {
+      throw new Error('請完整填寫商品金額及數量');
+    }
+
+    const value = Number(raw);
+
+    if (!Number.isFinite(value) || value < 0) {
+      throw new Error(key + ' 必須是有效的非負數字');
+    }
+
+    product[key] = value;
+  });
+
+  if (product.exchangeRate <= 0) {
+    throw new Error('換算匯率必須大於 0');
+  }
+
+  if (
+    !Number.isSafeInteger(product.quantityLimit) ||
+    product.quantityLimit < 1
+  ) {
+    throw new Error('數量上限必須是正整數');
+  }
+
+  if (
+    ![
+      '👤 所有人都可以購買',
+      '👤 指定成員'
+    ].includes(audience)
+  ) {
+    throw new Error('商品對象選項不正確');
+  }
+
+  const memberIds =
+    audience === '👤 指定成員'
+      ? Array.from(
+          memberCheckboxList.querySelectorAll(
+            'input[name="productMemberId"]:checked'
+          )
+        ).map(function(input) {
+          return input.value;
+        })
+      : [];
+
+  if (
+    audience === '👤 指定成員' &&
+    (!membersLoaded || memberIds.length === 0)
+  ) {
+    throw new Error('請至少選擇一位指定成員');
+  }
+
+  if (
+    memberIds.length > 100 ||
+    new Set(memberIds).size !== memberIds.length
+  ) {
+    throw new Error('指定成員數量或資料不正確');
+  }
+
+  product.note = String(data.get('note') || '').trim();
+  product.audience = audience;
+  product.memberIds = memberIds;
+
+  return product;
+}
 
   const previewButton = document.createElement('button');
   previewButton.type = 'button';
