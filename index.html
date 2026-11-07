@@ -1875,15 +1875,22 @@ const uuidPattern =
 
   // 取得 Firebase Token
   const idToken = await liyu2GetCurrentIdToken();
+  
+if (auth.currentUser?.uid !== currentUid) {
+  throw new Error(
+    '登入帳號已變更，請重新操作'
+  );
+}
 
-  if (auth.currentUser?.uid !== currentUid) {
-    throw new Error(
-      '登入帳號已變更，請重新操作'
-    );
-  }
+// 確認請求尚未進入送出或完成狀態
+if (record.status !== 'PREPARED') {
+  throw new Error(
+    '商品新增請求已處理或結果待確認，禁止重複送出'
+  );
+}
 
-  // 送出前先保存 PENDING
-  record.status = 'PENDING';
+// 送出前先保存 PENDING
+record.status = 'PENDING';
 
   sessionStorage.setItem(
     LIYU2_PRODUCT_REQUEST_KEY,
