@@ -2093,6 +2093,75 @@ addProductButton.addEventListener('click', function() {
     form.appendChild(input);
   });
 
+    // =========================
+  // 商品台幣成本自動換算
+  // 支援手動覆寫與重新計算
+  // =========================
+
+  const originalPriceInput =
+    form.querySelector('[name="originalPrice"]');
+
+  const exchangeRateInput =
+    form.querySelector('[name="exchangeRate"]');
+
+  const twdCostInput =
+  form.querySelector('[name="unitCostTwd"]');
+
+  let twdCostManuallyEdited = false;
+
+  function calculateProductTwdCost() {
+    if (twdCostManuallyEdited) return;
+
+    const price = Number(originalPriceInput.value);
+    const rate = Number(exchangeRateInput.value);
+
+    if (
+      originalPriceInput.value.trim() === '' ||
+      exchangeRateInput.value.trim() === '' ||
+      !Number.isFinite(price) ||
+      !Number.isFinite(rate) ||
+      price < 0 ||
+      rate <= 0
+    ) {
+      twdCostInput.value = '';
+      return;
+    }
+
+    twdCostInput.value =
+      String(Math.round((price * rate + Number.EPSILON) * 100) / 100);
+  }
+
+  originalPriceInput.addEventListener(
+    'input',
+    calculateProductTwdCost
+  );
+
+  exchangeRateInput.addEventListener(
+    'input',
+    calculateProductTwdCost
+  );
+
+  twdCostInput.addEventListener('input', function() {
+    twdCostManuallyEdited = true;
+  });
+
+  const recalculateButton =
+    document.createElement('button');
+
+  recalculateButton.type = 'button';
+  recalculateButton.textContent = '🔄 重新計算台幣成本';
+  recalculateButton.style.marginTop = '8px';
+
+  recalculateButton.addEventListener('click', function() {
+    twdCostManuallyEdited = false;
+    calculateProductTwdCost();
+  });
+
+  twdCostInput.insertAdjacentElement(
+    'afterend',
+    recalculateButton
+  );
+  
   const audienceLabel = document.createElement('label');
   audienceLabel.textContent = '商品對象';
   audienceLabel.style.display = 'block';
