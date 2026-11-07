@@ -1692,6 +1692,17 @@ async function liyu2CreateProductFromGas(
   throw new Error('商品資料格式不正確');
 }
 
+    // LIYU 2.0 TEST｜確認商品新增請求資料一致
+  const preparedRequest =
+    liyu2PrepareCreateProductRequest(activityId, productData);
+
+  if (
+    preparedRequest.activityId.toLowerCase() !== activityId.toLowerCase() ||
+    preparedRequest.requestId.toLowerCase() !== requestId.toLowerCase()
+  ) {
+    throw new Error('商品新增請求 ID 或活動 ID 不一致，禁止送出');
+  }
+  
   const idToken = await liyu2GetCurrentIdToken();
 
   if (auth.currentUser?.uid !== currentUid) {
