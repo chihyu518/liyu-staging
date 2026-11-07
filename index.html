@@ -2488,6 +2488,24 @@ previewButton.addEventListener('click', function() {
   }
 });
 
+  // ========================================
+// LIYU 2.0 TEST｜商品儲存按鈕
+// 預設停用，不執行任何寫入
+// ========================================
+
+const saveProductButton = document.createElement('button');
+
+saveProductButton.type = 'button';
+saveProductButton.textContent = '🔒 儲存商品（尚未開放）';
+saveProductButton.disabled = true;
+
+saveProductButton.style.marginTop = '12px';
+saveProductButton.style.padding = '10px 16px';
+saveProductButton.style.borderRadius = '10px';
+saveProductButton.style.opacity = '0.5';
+saveProductButton.style.cursor = 'not-allowed';
+
+form.appendChild(saveProductButton);
 
   addProductButton.insertAdjacentElement('afterend', form);
 });
