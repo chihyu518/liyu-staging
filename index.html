@@ -411,6 +411,36 @@ let liyu2CreateProductRequestId = null;
 
   // LIYU 2.0 TEST｜保留同一次商品新增請求的資料快照
 let liyu2CreateProductRequestData = null;
+
+  // ========================================
+// LIYU 2.0 TEST｜保存商品新增請求資料
+// 同一次請求不可更換商品內容
+// ========================================
+
+function liyu2GetCreateProductRequestData(productData) {
+
+  if (
+    !productData ||
+    typeof productData !== 'object' ||
+    Array.isArray(productData)
+  ) {
+    throw new Error('商品請求資料格式不正確');
+  }
+
+  const normalizedData = JSON.stringify(productData);
+
+  if (!liyu2CreateProductRequestData) {
+    liyu2CreateProductRequestData = normalizedData;
+  }
+
+  if (liyu2CreateProductRequestData !== normalizedData) {
+    throw new Error(
+      '商品資料已變更，不能沿用原本的新增請求'
+    );
+  }
+
+  return JSON.parse(liyu2CreateProductRequestData);
+}
   
 function liyu2GetCreateProductRequestId() {
 
