@@ -500,6 +500,25 @@ function liyu2ResetCreateProductRequestId() {
   liyu2CreateProductRequestActivityId = null;
 
 }
+
+  function liyu2PrepareCreateProductRequest(activityId, productData) {
+
+  const safeActivityId =
+    liyu2GetCreateProductRequestActivityId(activityId);
+
+  const safeProductData =
+    liyu2GetCreateProductRequestData(productData);
+
+  const safeRequestId =
+    liyu2GetCreateProductRequestId();
+
+  return {
+    activityId: safeActivityId,
+    productData: safeProductData,
+    requestId: safeRequestId
+  };
+
+}
   
   // ========================================
 // LIYU 2.0 TEST｜保存新增活動請求編號
