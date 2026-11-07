@@ -2645,6 +2645,12 @@ previewButton.addEventListener('click', function() {
 // 預設停用，不執行任何寫入
 // ========================================
 
+
+// ========================================
+// LIYU 2.0 TEST｜商品儲存按鈕
+// 預設關閉寫入，先完成安全流程
+// ========================================
+
 const saveProductButton = document.createElement('button');
 
 saveProductButton.type = 'button';
@@ -2654,10 +2660,89 @@ saveProductButton.disabled = true;
 saveProductButton.style.marginTop = '12px';
 saveProductButton.style.padding = '10px 16px';
 saveProductButton.style.borderRadius = '10px';
-saveProductButton.style.opacity = '0.5';
-saveProductButton.style.cursor = 'not-allowed';
 
 form.appendChild(saveProductButton);
+
+// 商品儲存功能開關
+// 目前維持 false，不允許送出
+const productSaveEnabled = false;
+
+// 避免重複點擊
+let productSaveInProgress = false;
+
+saveProductButton.addEventListener('click', async function() {
+
+  // 第一層：儲存按鈕安全開關
+  if (productSaveEnabled !== true) {
+    message.textContent = '🔒 TEST 商品儲存功能尚未開放';
+    return;
+  }
+
+  if (productSaveInProgress) {
+    return;
+  }
+
+  productSaveInProgress = true;
+  saveProductButton.disabled = true;
+
+  try {
+
+    // 驗證商品表單
+    const productData = liyu2ValidateProductForm();
+
+    // 確認目前登入帳號
+    const currentUid = auth.currentUser?.uid;
+
+    if (!currentUid) {
+      throw new Error('請先登入 Firebase');
+    }
+
+    message.textContent = '正在儲存 TEST 商品…';
+
+    // 呼叫 TEST 商品新增 API
+    const result = await liyu2CreateProductFromGas(
+      activity.id,
+      productData
+    );
+
+    // 避免切換帳號後顯示舊結果
+    if (auth.currentUser?.uid !== currentUid) {
+      throw new Error('登入帳號已變更，請重新確認結果');
+    }
+
+    // 確認 API 回傳
+    if (
+      !result ||
+      typeof result.productId !== 'string' ||
+      !result.productId
+    ) {
+      throw new Error(
+        '商品新增結果尚未確認，請勿直接重試'
+      );
+    }
+
+    message.textContent =
+      '✅ TEST 商品新增成功：' + result.productName;
+
+    // 成功後清除本次請求資料
+    liyu2ResetCreateProductRequestId();
+
+  } catch (error) {
+
+    message.textContent =
+      '❌ ' + (error.message || '商品儲存失敗');
+
+  } finally {
+
+    productSaveInProgress = false;
+
+    // 安全開關未開放時，按鈕持續停用
+    saveProductButton.disabled =
+      productSaveEnabled !== true;
+
+  }
+
+});
 
   addProductButton.insertAdjacentElement('afterend', form);
 });
