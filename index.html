@@ -2070,8 +2070,20 @@ liyu2BackButton.addEventListener('click', function() {
     status.style.color = isError ? '#a72745' : '#44506a';
   }
   // LIYU 2.0 TEST｜Firebase 登入後確認 GAS 身分
+  // LIYU 2.0 TEST｜記錄上一次 Firebase 登入帳號
+let liyu2PreviousAuthUid = auth.currentUser?.uid || null;
+  
 onAuthStateChanged(auth, async user => {
 
+    // LIYU 2.0 TEST｜登入帳號變更時清除商品新增請求
+  const currentAuthUid = user?.uid || null;
+
+  if (liyu2PreviousAuthUid !== currentAuthUid) {
+    liyu2ResetCreateProductRequestId();
+  }
+
+  liyu2PreviousAuthUid = currentAuthUid;
+  
   loginForm.classList.toggle('hidden', Boolean(user));
   userPanel.classList.toggle('hidden', !user);
 
