@@ -414,6 +414,39 @@ let liyu2CreateProductRequestData = null;
 
   // LIYU 2.0 TEST｜保存商品新增請求所屬活動 ID
 let liyu2CreateProductRequestActivityId = null;
+
+  // ========================================
+// LIYU 2.0 TEST｜商品新增活動 ID 綁定
+// 同一次請求不可更換所屬活動
+// ========================================
+
+function liyu2GetCreateProductRequestActivityId(activityId) {
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    typeof activityId !== 'string' ||
+    !uuidPattern.test(activityId)
+  ) {
+    throw new Error('商品新增：活動 ID 格式不正確');
+  }
+
+  if (liyu2CreateProductRequestActivityId === null) {
+    liyu2CreateProductRequestActivityId = activityId;
+  }
+
+  if (
+    liyu2CreateProductRequestActivityId.toLowerCase() !==
+    activityId.toLowerCase()
+  ) {
+    throw new Error(
+      '商品新增：不能沿用其他活動的請求 ID'
+    );
+  }
+
+  return liyu2CreateProductRequestActivityId;
+}
   
   // ========================================
 // LIYU 2.0 TEST｜保存商品新增請求資料
