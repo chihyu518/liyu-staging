@@ -601,6 +601,67 @@ function liyu2ResetCreateProductRequestId() {
   liyu2CreateProductRequestActivityId = null;
 
 }
+ 
+// ========================================
+// LIYU 2.0 TEST｜商品新增請求安全結案
+// 僅允許清除已確認完成的請求
+// ========================================
+
+function liyu2FinishCompletedProductRequest() {
+
+  const record = liyu2LoadProductCreateRequest();
+
+  if (!record) {
+    throw new Error(
+      '找不到商品新增請求紀錄'
+    );
+  }
+
+  const currentUid = auth.currentUser?.uid;
+
+  if (
+    !currentUid ||
+    record.uid !== currentUid
+  ) {
+    throw new Error(
+      '登入帳號與商品新增請求不一致'
+    );
+  }
+
+  if (
+    record.status !== 'COMPLETED'
+  ) {
+    throw new Error(
+      '商品新增結果尚未確認，禁止清除請求'
+    );
+  }
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    typeof record.productId !== 'string' ||
+    !uuidPattern.test(record.productId)
+  ) {
+    throw new Error(
+      '商品 ID 無效，禁止清除請求'
+    );
+  }
+
+  // 僅清除已確認成功的商品請求
+  sessionStorage.removeItem(
+    LIYU2_PRODUCT_REQUEST_KEY
+  );
+
+  // 同步清除記憶體中的舊請求
+  liyu2ResetCreateProductRequestId();
+
+  return {
+    success: true,
+    message: '已完成商品新增請求結案，可以開始下一筆'
+  };
+
+}
 
   function liyu2PrepareCreateProductRequest(activityId, productData) {
 
