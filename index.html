@@ -489,10 +489,111 @@ function liyu2GetCreateProductRequestId() {
 }
 
 // ========================================
-// LIYU 2.0 TEST｜重設商品新增請求
-// 同時清除 ID、商品資料與活動綁定
+// LIYU 2.0 TEST｜商品新增請求保護
+// 防止重新整理後遺失 requestId
 // ========================================
 
+const LIYU2_PRODUCT_REQUEST_KEY =
+  'LIYU2_TEST_PRODUCT_CREATE_REQUEST';
+
+// 讀取已保存的商品新增請求
+function liyu2LoadProductCreateRequest() {
+
+  const saved = sessionStorage.getItem(
+    LIYU2_PRODUCT_REQUEST_KEY
+  );
+
+  if (!saved) return null;
+
+  let record;
+
+  try {
+    record = JSON.parse(saved);
+  } catch (error) {
+    throw new Error(
+      '商品新增請求紀錄損壞，請先人工確認 TEST 資料庫'
+    );
+  }
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    !record ||
+    typeof record !== 'object' ||
+    !uuidPattern.test(record.requestId || '') ||
+    !uuidPattern.test(record.activityId || '') ||
+    typeof record.uid !== 'string' ||
+    !record.uid ||
+    !record.productData ||
+    typeof record.productData !== 'object' ||
+    Array.isArray(record.productData) ||
+    !['PREPARED', 'PENDING', 'UNKNOWN', 'COMPLETED']
+      .includes(record.status)
+  ) {
+    throw new Error(
+      '商品新增請求紀錄格式異常，禁止直接重新新增'
+    );
+  }
+
+  return record;
+}
+
+// 保存同一次商品新增請求
+function liyu2SaveProductCreateRequest(
+  activityId,
+  productData
+) {
+
+  const uid = auth.currentUser?.uid;
+
+  if (!uid) {
+    throw new Error('請先登入 Firebase');
+  }
+
+  const existing = liyu2LoadProductCreateRequest();
+
+  if (existing) {
+    if (
+      existing.uid !== uid ||
+      existing.activityId.toLowerCase() !==
+        activityId.toLowerCase() ||
+      JSON.stringify(existing.productData) !==
+        JSON.stringify(productData) ||
+      existing.status !== 'PREPARED'
+    ) {
+      throw new Error(
+        '已有尚未確認的商品新增請求，' +
+        '請先確認 TEST 資料庫及請求結果'
+      );
+    }
+
+    return existing;
+  }
+
+  const prepared = liyu2PrepareCreateProductRequest(
+    activityId,
+    productData
+  );
+
+  const record = {
+    requestId: prepared.requestId,
+    activityId: prepared.activityId,
+    productData: prepared.productData,
+    uid: uid,
+    status: 'PREPARED'
+  };
+
+  sessionStorage.setItem(
+    LIYU2_PRODUCT_REQUEST_KEY,
+    JSON.stringify(record)
+  );
+
+  return record;
+}
+
+// 商品新增請求重設
+// 預設只清除記憶體，不刪除待確認紀錄
 function liyu2ResetCreateProductRequestId() {
 
   liyu2CreateProductRequestId = null;
