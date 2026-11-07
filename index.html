@@ -2596,6 +2596,11 @@ function liyu2ValidateProductForm() {
   }
 
   product.note = String(data.get('note') || '').trim();
+  
+  if (product.note.length > 2000) {
+  throw new Error('商品備註不可超過 2000 字元');
+}
+  
   product.audience = audience;
   product.memberIds = memberIds;
 
