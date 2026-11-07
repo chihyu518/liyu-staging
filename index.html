@@ -2850,6 +2850,9 @@ function liyu2ResetProductFormAfterSuccess() {
   // 清空表單
   form.reset();
 
+  // 恢復下一件商品的自動換算功能
+twdCostManuallyEdited = false;
+  
   // 取消所有指定成員的勾選
   memberCheckboxList
     .querySelectorAll(
