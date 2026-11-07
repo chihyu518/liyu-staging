@@ -403,6 +403,23 @@ function liyu2GetCreateGroupBuyRequestId() {
 }
 
   // ========================================
+// LIYU 2.0 TEST｜商品新增請求 ID
+// 與代購活動請求 ID 分開管理
+// ========================================
+
+let liyu2CreateProductRequestId = null;
+
+function liyu2GetCreateProductRequestId() {
+
+  if (!liyu2CreateProductRequestId) {
+    liyu2CreateProductRequestId =
+      crypto.randomUUID();
+  }
+
+  return liyu2CreateProductRequestId;
+}
+  
+  // ========================================
 // LIYU 2.0 TEST｜保存新增活動請求編號
 // ========================================
 
