@@ -2947,8 +2947,8 @@ saveProductButton.addEventListener('click', async function() {
     message.textContent =
       '✅ TEST 商品新增成功：' + result.productName;
 
-    // 成功後清除本次請求資料
-    liyu2ResetCreateProductRequestId();
+    // 成功後安全結案，允許新增下一件商品
+liyu2FinishCompletedProductRequest();
 
   } catch (error) {
 
