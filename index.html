@@ -490,13 +490,14 @@ function liyu2GetCreateProductRequestId() {
 
 // ========================================
 // LIYU 2.0 TEST｜重設商品新增請求
-// 同時清除 requestId 與商品資料快照
+// 同時清除 ID、商品資料與活動綁定
 // ========================================
 
 function liyu2ResetCreateProductRequestId() {
 
   liyu2CreateProductRequestId = null;
   liyu2CreateProductRequestData = null;
+  liyu2CreateProductRequestActivityId = null;
 
 }
   
