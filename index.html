@@ -2896,10 +2896,18 @@ function liyu2ResetProductFormAfterSuccess() {
   const audienceInput =
     form.elements.namedItem('audience');
 
-  if (audienceInput) {
-    audienceInput.value =
-      '👤 所有人都可以購買';
-  }
+if (audienceInput) {
+  audienceInput.value =
+    '👤 所有人都可以購買';
+
+  // 同步原本的商品對象切換事件
+  audienceInput.dispatchEvent(
+    new Event('change', { bubbles: true })
+  );
+}
+
+// 確保指定成員區塊已隱藏
+memberSelectionArea.style.display = 'none';
 
   return true;
 }
