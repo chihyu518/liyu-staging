@@ -1665,9 +1665,13 @@ async function liyu2CreateProductFromGas(
     throw new Error('活動 ID 或請求 ID 格式不正確');
   }
 
-  if (!productData || typeof productData !== 'object') {
-    throw new Error('商品資料格式不正確');
-  }
+  if (
+  !productData ||
+  typeof productData !== 'object' ||
+  Array.isArray(productData)
+) {
+  throw new Error('商品資料格式不正確');
+}
 
   const idToken = await liyu2GetCurrentIdToken();
 
