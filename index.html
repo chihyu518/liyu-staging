@@ -2076,7 +2076,11 @@ onAuthStateChanged(auth, async user => {
   userPanel.classList.toggle('hidden', !user);
 
   if (!user) {
-    // LIYU 2.0 TEST｜登出時清除代購活動資料
+
+  // LIYU 2.0 TEST｜登出時清除商品新增請求資料
+  liyu2ResetCreateProductRequestId();
+
+  // LIYU 2.0 TEST｜登出時清除代購活動資料
 const section = document.getElementById('liyu2MyGroupBuysSection');
 const list = document.getElementById('liyu2GroupBuysList');
 const message = document.getElementById('liyu2GroupBuysMessage');
