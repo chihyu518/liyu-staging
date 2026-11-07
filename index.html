@@ -2829,6 +2829,80 @@ function liyu2ValidateProductForm() {
 
   return product;
 }
+  
+// ========================================
+// LIYU 2.0 TEST｜商品新增成功後重設表單
+// 不清除活動、登入資訊及請求紀錄
+// ========================================
+
+function liyu2ResetProductFormAfterSuccess() {
+
+  // 確認沒有尚未結案的商品新增請求
+  const existingRequest =
+    liyu2LoadProductCreateRequest();
+
+  if (existingRequest) {
+    throw new Error(
+      '商品新增請求尚未安全結案，禁止重設表單'
+    );
+  }
+
+  // 清空表單
+  form.reset();
+
+  // 取消所有指定成員的勾選
+  memberCheckboxList
+    .querySelectorAll(
+      'input[name="productMemberId"]'
+    )
+    .forEach(function(input) {
+      input.checked = false;
+    });
+
+  // 恢復預設幣別與匯率
+  const currencyInput =
+    form.elements.namedItem('currency');
+
+  const exchangeRateInput =
+    form.elements.namedItem('exchangeRate');
+
+  if (currencyInput) {
+    currencyInput.value = 'TWD';
+  }
+
+  if (exchangeRateInput) {
+    exchangeRateInput.value = '1';
+  }
+
+  // 清空原幣價格與台幣成本
+  [
+    'originalPrice',
+    'unitCostTwd',
+    'memberPriceTwd',
+    'buyerPriceTwd',
+    'quantityLimit'
+  ].forEach(function(fieldName) {
+
+    const input =
+      form.elements.namedItem(fieldName);
+
+    if (input) {
+      input.value = '';
+    }
+
+  });
+
+  // 恢復商品對象預設值
+  const audienceInput =
+    form.elements.namedItem('audience');
+
+  if (audienceInput) {
+    audienceInput.value =
+      '👤 所有人都可以購買';
+  }
+
+  return true;
+}
 
   const previewButton = document.createElement('button');
   
