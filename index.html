@@ -1526,7 +1526,97 @@ async function liyu2GetProductsFromGas(activityId) {
 
   return result.data.products;
 }
- 
+
+  // ========================================
+// LIYU 2.0 TEST｜商品新增 API
+// 預設鎖定，不允許送出寫入請求
+// ========================================
+
+async function liyu2CreateProductFromGas(
+  activityId,
+  productData,
+  requestId
+) {
+
+  // 前端第三道安全開關
+  const productCreateFrontendEnabled = false;
+
+  if (productCreateFrontendEnabled !== true) {
+    throw new Error(
+      'TEST 商品新增前端 API 尚未開放，未送出任何寫入請求'
+    );
+  }
+
+  // 確認目前登入者
+  const currentUid = auth.currentUser?.uid;
+
+  if (!currentUid) {
+    throw new Error('請先登入 Firebase');
+  }
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    typeof activityId !== 'string' ||
+    !uuidPattern.test(activityId) ||
+    typeof requestId !== 'string' ||
+    !uuidPattern.test(requestId)
+  ) {
+    throw new Error('活動 ID 或請求 ID 格式不正確');
+  }
+
+  if (!productData || typeof productData !== 'object') {
+    throw new Error('商品資料格式不正確');
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  if (auth.currentUser?.uid !== currentUid) {
+    throw new Error('登入帳號已變更，請重新操作');
+  }
+
+  const response = await fetch(window.API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+      action: 'liyu2CreateProduct',
+      idToken: idToken,
+      activityId: activityId,
+      requestId: requestId,
+      data: productData
+    }),
+    redirect: 'follow'
+  });
+
+  if (auth.currentUser?.uid !== currentUid) {
+    throw new Error('登入帳號已變更，請重新操作');
+  }
+
+  if (!response.ok) {
+    throw new Error('TEST 商品新增 API 連線失敗');
+  }
+
+  const result = await response.json();
+
+  if (
+    !result ||
+    result.success !== true ||
+    result.environment !== 'TEST' ||
+    !result.data ||
+    typeof result.data.productId !== 'string' ||
+    !uuidPattern.test(result.data.productId) ||
+    typeof result.data.productName !== 'string' ||
+    typeof result.data.duplicateRequest !== 'boolean'
+  ) {
+    throw new Error('TEST 商品新增 API 回傳資料驗證失敗');
+  }
+
+  return result.data;
+}
+  
 async function liyu2GetTestMembersFromGas() {
   const idToken = await liyu2GetCurrentIdToken();
 
