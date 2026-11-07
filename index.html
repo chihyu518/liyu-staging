@@ -1652,8 +1652,7 @@ async function liyu2GetProductsFromGas(activityId) {
 
 async function liyu2CreateProductFromGas(
   activityId,
-  productData,
-  requestId
+  productData
 ) {
 
   // 前端第三道安全開關
@@ -1676,13 +1675,11 @@ async function liyu2CreateProductFromGas(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   if (
-    typeof activityId !== 'string' ||
-    !uuidPattern.test(activityId) ||
-    typeof requestId !== 'string' ||
-    !uuidPattern.test(requestId)
-  ) {
-    throw new Error('活動 ID 或請求 ID 格式不正確');
-  }
+  typeof activityId !== 'string' ||
+  !uuidPattern.test(activityId)
+) {
+  throw new Error('活動 ID 格式不正確');
+}
 
   if (
   !productData ||
@@ -1694,14 +1691,15 @@ async function liyu2CreateProductFromGas(
 
     // LIYU 2.0 TEST｜確認商品新增請求資料一致
   const preparedRequest =
-    liyu2PrepareCreateProductRequest(activityId, productData);
+  liyu2PrepareCreateProductRequest(activityId, productData);
 
-  if (
-    preparedRequest.activityId.toLowerCase() !== activityId.toLowerCase() ||
-    preparedRequest.requestId.toLowerCase() !== requestId.toLowerCase()
-  ) {
-    throw new Error('商品新增請求 ID 或活動 ID 不一致，禁止送出');
-  }
+if (
+  preparedRequest.activityId.toLowerCase() !== activityId.toLowerCase() ||
+  typeof preparedRequest.requestId !== 'string' ||
+  !uuidPattern.test(preparedRequest.requestId)
+) {
+  throw new Error('商品新增請求 ID 或活動 ID 驗證失敗，禁止送出');
+}
   
   const idToken = await liyu2GetCurrentIdToken();
 
