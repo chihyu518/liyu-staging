@@ -1751,12 +1751,18 @@ async function liyu2GetProductsFromGas(activityId) {
 // 預設鎖定，不允許送出寫入請求
 // ========================================
 
+
+// ========================================
+// LIYU 2.0 TEST｜商品新增 API
+// requestId 保存與防重複保護
+// ========================================
+
 async function liyu2CreateProductFromGas(
   activityId,
   productData
 ) {
 
-  // 前端第三道安全開關
+  // 第三道安全開關：目前禁止寫入
   const productCreateFrontendEnabled = false;
 
   if (productCreateFrontendEnabled !== true) {
@@ -1765,7 +1771,6 @@ async function liyu2CreateProductFromGas(
     );
   }
 
-  // 確認目前登入者
   const currentUid = auth.currentUser?.uid;
 
   if (!currentUid) {
@@ -1773,80 +1778,136 @@ async function liyu2CreateProductFromGas(
   }
 
   const uuidPattern =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   if (
-  typeof activityId !== 'string' ||
-  !uuidPattern.test(activityId)
-) {
-  throw new Error('活動 ID 格式不正確');
-}
+    typeof activityId !== 'string' ||
+    !uuidPattern.test(activityId)
+  ) {
+    throw new Error('活動 ID 格式不正確');
+  }
 
   if (
-  !productData ||
-  typeof productData !== 'object' ||
-  Array.isArray(productData)
-) {
-  throw new Error('商品資料格式不正確');
-}
+    !productData ||
+    typeof productData !== 'object' ||
+    Array.isArray(productData)
+  ) {
+    throw new Error('商品資料格式不正確');
+  }
 
-    // LIYU 2.0 TEST｜確認商品新增請求資料一致
-  const preparedRequest =
-  liyu2PrepareCreateProductRequest(activityId, productData);
+  // 讀取或建立同一次商品新增請求
+  const record = liyu2SaveProductCreateRequest(
+    activityId,
+    productData
+  );
 
-if (
-  preparedRequest.activityId.toLowerCase() !== activityId.toLowerCase() ||
-  typeof preparedRequest.requestId !== 'string' ||
-  !uuidPattern.test(preparedRequest.requestId)
-) {
-  throw new Error('商品新增請求 ID 或活動 ID 驗證失敗，禁止送出');
-}
-  
+  if (
+    record.uid !== currentUid ||
+    record.activityId.toLowerCase() !==
+      activityId.toLowerCase() ||
+    !uuidPattern.test(record.requestId)
+  ) {
+    throw new Error(
+      '商品新增請求資料不一致，禁止送出'
+    );
+  }
+
+  // 取得 Firebase Token
   const idToken = await liyu2GetCurrentIdToken();
 
   if (auth.currentUser?.uid !== currentUid) {
-    throw new Error('登入帳號已變更，請重新操作');
+    throw new Error(
+      '登入帳號已變更，請重新操作'
+    );
   }
 
-  const response = await fetch(window.API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify({
-  action: 'liyu2CreateProduct',
-  idToken: idToken,
-  activityId: preparedRequest.activityId,
-  requestId: preparedRequest.requestId,
-  data: preparedRequest.productData
-}),
-    redirect: 'follow'
-  });
+  // 送出前先保存 PENDING
+  record.status = 'PENDING';
 
-  if (auth.currentUser?.uid !== currentUid) {
-    throw new Error('登入帳號已變更，請重新操作');
+  sessionStorage.setItem(
+    LIYU2_PRODUCT_REQUEST_KEY,
+    JSON.stringify(record)
+  );
+
+  let result;
+
+  try {
+
+    const response = await fetch(window.API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action: 'liyu2CreateProduct',
+        idToken: idToken,
+        activityId: record.activityId,
+        requestId: record.requestId,
+        data: record.productData
+      }),
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        'TEST 商品新增 API 連線失敗'
+      );
+    }
+
+    result = await response.json();
+
+    if (
+      auth.currentUser?.uid !== currentUid
+    ) {
+      throw new Error(
+        '登入帳號已變更，請人工確認商品結果'
+      );
+    }
+
+    if (
+      !result ||
+      result.success !== true ||
+      result.environment !== 'TEST' ||
+      !result.data ||
+      typeof result.data.productId !== 'string' ||
+      !uuidPattern.test(result.data.productId) ||
+      typeof result.data.productName !== 'string' ||
+      typeof result.data.duplicateRequest !== 'boolean'
+    ) {
+      throw new Error(
+        '商品新增結果無法確認，請先檢查 TEST Notion'
+      );
+    }
+
+    // 成功時保留已完成紀錄
+    record.status = 'COMPLETED';
+    record.productId = result.data.productId;
+
+    sessionStorage.setItem(
+      LIYU2_PRODUCT_REQUEST_KEY,
+      JSON.stringify(record)
+    );
+
+    return result.data;
+
+  } catch (error) {
+
+    // 結果不明時，保留原請求 ID
+    record.status = 'UNKNOWN';
+
+    sessionStorage.setItem(
+      LIYU2_PRODUCT_REQUEST_KEY,
+      JSON.stringify(record)
+    );
+
+    throw new Error(
+      'TEST 商品新增結果尚未確認，' +
+      '請先檢查 Notion，禁止直接重新新增。' +
+      '原因：' + error.message
+    );
+
   }
 
-  if (!response.ok) {
-    throw new Error('TEST 商品新增 API 連線失敗');
-  }
-
-  const result = await response.json();
-
-  if (
-    !result ||
-    result.success !== true ||
-    result.environment !== 'TEST' ||
-    !result.data ||
-    typeof result.data.productId !== 'string' ||
-    !uuidPattern.test(result.data.productId) ||
-    typeof result.data.productName !== 'string' ||
-    typeof result.data.duplicateRequest !== 'boolean'
-  ) {
-    throw new Error('TEST 商品新增 API 回傳資料驗證失敗');
-  }
-
-  return result.data;
 }
   
 async function liyu2GetTestMembersFromGas() {
