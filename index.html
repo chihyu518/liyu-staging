@@ -1824,7 +1824,7 @@ async function liyu2CreateProductFromGas(
 ) {
 
   // 第三道安全開關：目前禁止寫入
-  const productCreateFrontendEnabled = false;
+  const productCreateFrontendEnabled = true;
 
   if (productCreateFrontendEnabled !== true) {
     throw new Error(
@@ -3052,7 +3052,7 @@ form.appendChild(saveProductButton);
 
 // 商品儲存功能開關
 // 目前維持 false，不允許送出
-const productSaveEnabled = false;
+const productSaveEnabled = true;
 
 // 避免重複點擊
 let productSaveInProgress = false;
