@@ -2576,6 +2576,26 @@ addProductButton.addEventListener('click', function() {
 
   let twdCostManuallyEdited = false;
 
+  // ========================================
+// LIYU 2.0 TEST｜商品幣別切換
+// ========================================
+
+currencySelect.addEventListener('change', function() {
+
+  if (currencySelect.value === 'TWD') {
+    exchangeRateInput.value = '1';
+  } else if (
+    currencySelect.value === 'JPY' ||
+    currencySelect.value === 'KRW'
+  ) {
+    exchangeRateInput.value = '';
+  }
+
+  twdCostManuallyEdited = false;
+  calculateProductTwdCost();
+
+});
+  
   function calculateProductTwdCost() {
     if (twdCostManuallyEdited) return;
 
