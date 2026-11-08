@@ -2648,6 +2648,9 @@ currencySelect.addEventListener('change', function() {
     'afterend',
     recalculateButton
   );
+
+  // LIYU 2.0 TEST｜初始化台幣成本
+calculateProductTwdCost();
   
   const audienceLabel = document.createElement('label');
   audienceLabel.textContent = '商品對象';
