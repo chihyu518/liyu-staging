@@ -539,6 +539,37 @@ function liyu2LoadProductCreateRequest() {
   return record;
 }
 
+  
+function liyu2CheckProductRecoveryReadiness() {
+  const record = liyu2LoadProductCreateRequest();
+
+  if (!record) {
+    throw new Error('找不到原始商品新增請求');
+  }
+
+  if (record.status !== 'UNKNOWN') {
+    throw new Error(
+      '目前不是 UNKNOWN 狀態，禁止進入恢復流程'
+    );
+  }
+
+  const currentUid = auth.currentUser?.uid;
+
+  if (!currentUid || record.uid !== currentUid) {
+    throw new Error(
+      '目前登入者與原始請求不一致'
+    );
+  }
+
+  return {
+    readyForReview: true,
+    status: record.status,
+    hasRequestId: true,
+    hasActivityId: true,
+    hasProductData: true
+  };
+}
+
 // 保存同一次商品新增請求
 function liyu2SaveProductCreateRequest(
   activityId,
@@ -1924,6 +1955,21 @@ record.status = 'PENDING';
 
     result = await response.json();
 
+    // LIYU TEST｜商品新增 API 安全診斷
+// 不輸出 Token、UID、商品資料或請求 ID
+console.info('LIYU_TEST_PRODUCT_CREATE_RESPONSE', {
+  success: result?.success === true,
+  environment: result?.environment ?? null,
+  hasData: !!result?.data,
+  hasProductId:
+    typeof result?.data?.productId === 'string',
+  hasProductName:
+    typeof result?.data?.productName === 'string',
+  hasDuplicateFlag:
+    typeof result?.data?.duplicateRequest === 'boolean',
+  messageType: typeof result?.message
+});
+    
     if (
       auth.currentUser?.uid !== currentUid
     ) {
