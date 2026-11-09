@@ -1970,7 +1970,11 @@ console.info('LIYU_TEST_PRODUCT_CREATE_RESPONSE', {
     typeof result?.data?.productName === 'string',
   hasDuplicateFlag:
     typeof result?.data?.duplicateRequest === 'boolean',
-  messageType: typeof result?.message
+    messageType: typeof result?.message,
+  errorCode:
+    typeof result?.errorCode === 'string'
+      ? result.errorCode
+      : null
 });
     
     if (
