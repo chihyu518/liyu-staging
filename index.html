@@ -1971,10 +1971,16 @@ console.info('LIYU_TEST_PRODUCT_CREATE_RESPONSE', {
   hasDuplicateFlag:
     typeof result?.data?.duplicateRequest === 'boolean',
     messageType: typeof result?.message,
-  errorCode:
-    typeof result?.errorCode === 'string'
-      ? result.errorCode
-      : null
+  
+errorCode:
+  typeof result?.errorCode === 'string'
+    ? result.errorCode
+    : null,
+failureCategory:
+  typeof result?.failureCategory === 'string'
+    ? result.failureCategory
+    : null
+
 });
     
     if (
