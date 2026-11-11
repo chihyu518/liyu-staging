@@ -1976,9 +1976,20 @@ errorCode:
   typeof result?.errorCode === 'string'
     ? result.errorCode
     : null,
+  
 failureCategory:
   typeof result?.failureCategory === 'string'
     ? result.failureCategory
+    : null,
+
+notionHttpStatus:
+  Number.isInteger(result?.notionHttpStatus)
+    ? result.notionHttpStatus
+    : null,
+
+notionErrorCode:
+  typeof result?.notionErrorCode === 'string'
+    ? result.notionErrorCode
     : null
 
 });
