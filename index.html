@@ -2719,7 +2719,7 @@ calculateProductTwdCost();
   const audienceSelect = document.createElement('select');
   audienceSelect.name = 'audience';
 
-  ['👤 所有人都可以購買', '👤 指定成員'].forEach(function(value) {
+  ['👥 所有人都可以購買', '👤 指定成員'].forEach(function(value) {
     const option = document.createElement('option');
     option.value = value;
     option.textContent = value;
@@ -2924,7 +2924,7 @@ if (
 
   if (
     ![
-      '👤 所有人都可以購買',
+      '👥 所有人都可以購買',
       '👤 指定成員'
     ].includes(audience)
   ) {
@@ -3039,7 +3039,7 @@ twdCostManuallyEdited = false;
 
 if (audienceInput) {
   audienceInput.value =
-    '👤 所有人都可以購買';
+    '👥 所有人都可以購買';
 
   // 同步原本的商品對象切換事件
   audienceInput.dispatchEvent(
