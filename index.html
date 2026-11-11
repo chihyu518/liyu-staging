@@ -2110,6 +2110,36 @@ async function liyu2CallProductRecoveryApi(
 
   return result;
 }
+
+  // ========================================
+// LIYU 2.0 TEST｜手動恢復既有商品
+// 不重新新增、不清除原始請求
+// ========================================
+
+window.liyu2RecoverPendingProduct = async function () {
+
+  const record = liyu2LoadProductCreateRequest();
+
+  if (!record || record.status !== 'UNKNOWN') {
+    throw new Error(
+      '目前沒有可恢復的 UNKNOWN 商品請求'
+    );
+  }
+
+  const idToken = await liyu2GetCurrentIdToken();
+
+  const result = await liyu2CallProductRecoveryApi(
+    idToken,
+    record
+  );
+
+  console.log(
+    'LIYU2_PRODUCT_RECOVERY_RESULT:',
+    result
+  );
+
+  return result;
+};
   
 async function liyu2GetTestMembersFromGas() {
   const idToken = await liyu2GetCurrentIdToken();
