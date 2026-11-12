@@ -2133,9 +2133,52 @@ window.liyu2RecoverPendingProduct = async function () {
     record
   );
 
+    // 僅在後端確認既有商品後，更新請求狀態
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (
+    result?.success !== true ||
+    result.environment !== 'TEST' ||
+    result.data?.recovered !== true ||
+    result.data?.duplicateRequest !== true ||
+    typeof result.data?.productId !== 'string' ||
+    !uuidPattern.test(result.data.productId)
+  ) {
+    throw new Error(
+      '商品恢復結果尚未確認，保留原始請求'
+    );
+  }
+
+  // 確認原始請求未在等待期間被更換
+  const currentRecord = liyu2LoadProductCreateRequest();
+
+  if (
+    !currentRecord ||
+    currentRecord.status !== 'UNKNOWN' ||
+    currentRecord.requestId !== record.requestId ||
+    currentRecord.activityId !== record.activityId ||
+    currentRecord.uid !== record.uid
+  ) {
+    throw new Error(
+      '原始商品請求已變更，禁止更新恢復狀態'
+    );
+  }
+
+  currentRecord.status = 'COMPLETED';
+  currentRecord.productId = result.data.productId;
+
+  sessionStorage.setItem(
+    LIYU2_PRODUCT_REQUEST_KEY,
+    JSON.stringify(currentRecord)
+  );
+
   console.log(
-    'LIYU2_PRODUCT_RECOVERY_RESULT:',
-    result
+    'LIYU2_PRODUCT_RECOVERY_COMPLETED:',
+    {
+      success: true,
+      recovered: true
+    }
   );
 
   return result;
