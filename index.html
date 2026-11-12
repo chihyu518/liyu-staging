@@ -3406,11 +3406,73 @@ try {
   productMessage.textContent =
     '找到 ' + products.length + ' 筆商品';
 
-  products.forEach(function(product) {
-    const row = document.createElement('p');
-    row.textContent = '📦 ' + (product.name || '未命名商品');
-    detailContent.appendChild(row);
+  // LIYU 2.0 TEST｜商品列表與價格顯示
+products.forEach(function(product) {
+
+  const card = document.createElement('div');
+
+  card.style.cssText = `
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
+    background: #f8fbff;
+    line-height: 1.8;
+    font-size: 15px;
+  `;
+
+  // 商品名稱
+  const name = document.createElement('div');
+  name.textContent =
+    '📦 ' + (product.name || '未命名商品');
+
+  name.style.cssText = `
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  `;
+
+  card.appendChild(name);
+
+  // 價格格式化
+  function formatPrice(value, currency) {
+    if (typeof value !== 'number' ||
+        !Number.isFinite(value)) {
+      return '未設定';
+    }
+
+    const symbol =
+      currency === 'JPY' ? '¥' :
+      currency === 'KRW' ? '₩' :
+      'NT$';
+
+    return symbol + value.toLocaleString('en-US');
+  }
+
+  const fields = [
+    ['原幣價格',
+      formatPrice(product.originalPrice, product.currency)],
+    ['換算匯率',
+      product.exchangeRate ?? '未設定'],
+    ['台幣成本',
+      formatPrice(product.unitCostTwd, 'TWD')],
+    ['團員售價',
+      formatPrice(product.memberPriceTwd, 'TWD')],
+    ['買家售價',
+      formatPrice(product.buyerPriceTwd, 'TWD')],
+    ['數量上限',
+      product.quantityLimit ?? '未設定']
+  ];
+
+  fields.forEach(function(field) {
+    const line = document.createElement('div');
+    line.textContent = field[0] + '：' + field[1];
+    card.appendChild(line);
   });
+
+  detailContent.appendChild(card);
+
+});
 
   if (productResult.data.hasMore === true) {
     const notice = document.createElement('p');
